@@ -1,0 +1,31 @@
+{{template "base".}}
+
+{{define "content"}}
+
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>About Page here</h1>
+
+                <p>This is a About Page</p>
+                <p>some text here</p>
+                <p>Paragraph text Here</p>
+                <p>More Text here</p>
+                <p>More ....</p>
+                {{/*             means looking for something that has an indices*/}}
+                {{/*               looking for string Map, the . refers to all the data passed to the Template,*/}}
+                {{/*               and looking for one  particular element, and looking for the index with Key test*/}}
+                <p>This Came from the Template: {{index .StringMap "remote_ip"}}</p>
+
+                {{if ne (index .StringMap "remote_ip") ""}}
+                    Your remote IP address is {{index .StringMap "remote_ip"}}
+                {{else}}
+                    I don't know your IP address yet Visit the <a href="/">Home page</a>
+                    so i can set it.
+                {{end}}
+
+            </div>
+        </div>
+    </div>
+
+{{end}}
