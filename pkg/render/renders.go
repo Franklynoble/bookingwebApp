@@ -3,8 +3,9 @@ package render
 import (
 	"bytes"
 	"fmt"
-	"github.com/Franlky/gowebcourse/Models"
-	"github.com/Franlky/gowebcourse/config"
+	"github.com/Franlky01/bookingwebApp/Models"
+      "github.com/Franlky01/bookingwebApp/config"
+
 	"html/template"
 	"log"
 	"net/http"

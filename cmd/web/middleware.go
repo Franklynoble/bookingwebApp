@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/justinas/nosurf"
-	"net/http"
 	_ "github.com/justinas/nosurf"
+	"net/http"
 )
 
 func WriteToConcole(next http.Handler) http.Handler {

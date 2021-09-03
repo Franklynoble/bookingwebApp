@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/Franlky/gowebcourse/config"
-	"github.com/Franlky/gowebcourse/pkg/handlers"
+	"github.com/Franlky01/bookingwebApp/config"
+	"github.com/Franlky01/bookingwebApp/pkg/handlers"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"net/http"

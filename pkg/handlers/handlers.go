@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/Franlky/gowebcourse/Models"
-	"github.com/Franlky/gowebcourse/config"
-	"github.com/Franlky/gowebcourse/pkg/render"
+	"github.com/Franlky01/bookingwebApp/Models"
+	"github.com/Franlky01/bookingwebApp/config"
+	"github.com/Franlky01/bookingwebApp/pkg/render"
 	"net/http"
 )
 

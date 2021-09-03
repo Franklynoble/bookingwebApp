@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/Franlky/gowebcourse/config"
-	"github.com/Franlky/gowebcourse/pkg/handlers"
-	"github.com/Franlky/gowebcourse/pkg/render"
+	"github.com/Franlky01/bookingwebApp/config"
+
+	"github.com/Franlky01/bookingwebApp/pkg/handlers"
+	"github.com/Franlky01/bookingwebApp/pkg/render"
 	"github.com/alexedwards/scs/v2"
 	"log"
 	"net/http"
