@@ -20,6 +20,11 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/", handlers.Repo.Home)
 	mux.Get("/about", handlers.Repo.About)
 
+	mux.Get("/generals-quarters", handlers.Repo.Generals)
+
+	mux.Get("/majors-suite", handlers.Repo.Majors)
+	mux.Get("/search-availability", handlers.Repo.Availability)
+
 	fileServer := http.FileServer(http.Dir("./static/"))
 	//use mux to look for the path name
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
