@@ -4,18 +4,64 @@
 
 {{define "content"}}
 
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <h1>Home Page here</h1>
 
-                <p>This is a Home Page</p>
-                <p>some text here</p>
-                  <img src="/static/images/house.jpg" height="321" width="474">
+    <div id="main-carousel" class="carousel slide carousel-fade" data-ride="carousel">
 
+        <ol class="carousel-indicators">
+            <li data-target="#main-carousel" data-slide-to="0" class="active"></li>
+            <li data-target="#main-carousel" data-slide-to="1"></li>
+            <li data-target="#main-carousel" data-slide-to="2"></li>
+        </ol>
+
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="/static/images/woman-laptop.png" class="d-block w-100" alt="woman-laptop">
+
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>First slide label</h5>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="/static/images/outside.png" class="d-block w-100" alt="out side">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Second slide label</h5>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="/static/images/tray.png" class="d-block w-100" alt="tray and coffee">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Third slide label</h5>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                </div>
             </div>
         </div>
     </div>
+
+
+    <div class="container">
+
+
+        <div class="row">
+
+
+            <div class="row">
+                <div class="col">
+                    <!--use bootstrap to set the text to center, and set the margin top to 4-->
+                    <h1 class="text-center mt-4">Welcome to Forth Smythe Bed and Breakfast</h1>
+                    <p> You're Home away From home, set on the majestic ocean, this will be a vacation to remember
+                        You're Home away From home, set on the majestic ocean, this will be a vacation to remember
+                        You're Home away From home, set on the majestic ocean, this will be a vacation to remember
+                        You're Home away From home, set on the majestic ocean, this will be a vacation to remember
+                        You're Home away From home, set on the majestic ocean, this will be a vacation to remember</p>
+                </div>
+            </div>
+            <div class="col text-center">
+
+                <a href="/search-availability" class="btn btn-success">Make Reservation Now</a>
+            </div>
+        </div>
 
 
 {{end}}

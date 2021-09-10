@@ -3,8 +3,9 @@ package render
 import (
 	"bytes"
 	"fmt"
-	"github.com/Franlky01/bookingwebApp/Models"
-      "github.com/Franlky01/bookingwebApp/config"
+	"github.com/Franlky01/bookingwebApp/internal/Models"
+	"github.com/Franlky01/bookingwebApp/internal/config"
+	"github.com/justinas/nosurf"
 
 	"html/template"
 	"log"
@@ -15,7 +16,8 @@ import (
 var functions = template.FuncMap{}
 var app *config.AppConfig
 
-func AddDefaultData(td *Models.TemplateData) *Models.TemplateData {
+func AddDefaultData(td *Models.TemplateData, r *http.Request) *Models.TemplateData {
+	td.CSRFToken = nosurf.Token(r)
 
 	return td
 }
@@ -26,7 +28,7 @@ func NewTemplate(a *config.AppConfig) {
 }
 
 //Renders templates using html Template
-func RenderTemplate(w http.ResponseWriter, tmpl string, td *Models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *Models.TemplateData) {
 	var tc map[string]*template.Template
 
 	if app.UseCache { //if UseCache is true, use the information from the template TemplateCache
@@ -49,8 +51,8 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, td *Models.TemplateData)
 	}
 	//write to hold bytes of buffer
 	buf := new(bytes.Buffer) //creates new Buffer
-	td = AddDefaultData(td)
-	_ = t.Execute(buf, td)   //execute into the Buffer, also adding the TemplateData to the Buffer
+	td = AddDefaultData(td, r)
+	_ = t.Execute(buf, td) //execute into the Buffer, also adding the TemplateData to the Buffer
 
 	_, err := buf.WriteTo(w) // from the Buffer write to responseWriter
 	if err != nil {
@@ -104,7 +106,6 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 		if len(matches) > 0 {
 			ts, err = ts.ParseGlob("./templates/*.layout.gohtml")
 			if err != nil {
-
 				return myCach, err
 			}
 

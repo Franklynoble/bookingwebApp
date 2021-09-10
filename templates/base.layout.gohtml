@@ -1,4 +1,4 @@
-{{define "base"}}
+ {{define "base"}}
     <!doctype html>
     <html lang="en">
     <head>
@@ -27,7 +27,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/about">About</a>
@@ -47,10 +47,14 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/search-availability" tabindex="-1" aria-disabled="true">Reservation</a>
+                    <a class="nav-link" href="/search-availability" tabindex="-1" aria-disabled="true">Book Now</a>
                 </li>
+
+{{/*                <li class="nav-item">*/}}
+{{/*                    <a class="nav-link" href="/booking" tabindex="-1" aria-disabled="true">Book now</a>*/}}
+{{/*                </li>*/}}
                 <li class="nav-item">
-                    <a class="nav-link" href="contact.html" tabindex="-1" aria-disabled="true">Contact</a>
+                    <a class="nav-link" href="/contact" tabindex="-1" aria-disabled="true">Contact</a>
                 </li>
             </ul>
 
@@ -58,7 +62,7 @@
     </nav>
 
     {{block "content" .}}{{end}}
-    {{block "js" .}}{{end}}
+
     <div class="row my-footer">
         <div class="col">
             left
@@ -69,6 +73,7 @@
         <div class="col">
             Right
         </div>
+    </div>
     </div>
 
 
@@ -87,40 +92,16 @@
     <!--sweet Alert-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
-    </div>
+    {{block "js".}}
+        {{end}}
+
+
 
 
     <script>
         let attention = Prompt();
 
-        document.getElementById("colorButton").addEventListener("click", function () {
-            let html = `
-        <form id="check-availability action="" method="post" novalidate class="needs-validation"
-           <div class="form-row">
-                    <div class="col">
-                   <div class="form-row" id="reservation-dates-modal">
-                    <div class="col">
-                     <input disabled required class="form-control" type="text" name="start" id="start" placeholder="Arrival">
-                      </div>
-                   <div class="col">
-                     <input disabled required class="form-control" type="text" name="end" id="end" placeholder="Departure">
-                      </div>
-                     </div>
-</div>
-</div>
-     </form>
-    `
-            attention.custom({
-                msg: html, title: "choose your dates"
-            });
-        })
 
-        // <!--Date range validtaion---->
-        const elem = document.getElementById('reservation-dates');
-        const rangepicker = new DateRangePicker(elem, {
-            // ...options here date format can be specified here
-            format: "yyy-mm-dd"
-        });
         //to be edited
 
             // Example starter JavaScript for disabling form submissions if there are invalid fields
@@ -151,19 +132,15 @@
             }
 
 
-
-
-
-
 //prompt
-        function notifyModal(title, text, icon, confirmationButton) {
+        function notifyModal(title, text, icon, confirmationButtonText) {
 
             Swal.fire({
                 title: title,
-                text: text,
+                html: text,
                 icon: icon,
                 //  showCancelButton: true,
-                confirmButtonText: confirmationButton,
+                confirmButtonText: confirmationButtonText,
             })
 
         }
@@ -174,158 +151,122 @@
 
 
 //prompt is our Javascript module for all alerts, notification, and custom popup dialogs
-        function Prompt(c) {
-            const {
-                msg = "",
-                icon = "success",
-                position = "top-end",
-            } = c;
+        function Prompt() {
+            let toast = function (c) {
+                const {
+                    msg = "",
+                    icon = "success",
+                    position = "top-end",
+                } = c;
+                const Toast = Swal.mixin({
+                    toast: true,
+                    title: msg,
+                    position: position,
+                    icon: icon,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
 
-            const Toast = Swal.mixin({
-                toast: true,
-                title: msg,
-                position: position,
-                icon:icon,
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            })
-
-            Toast.fire({})
-        }
-        let success = function (c) {
+                Toast.fire({})
+            }
+            let success = function (c) {
                 const {
                     msg = "",
                     title = "",
                     footer = "",
                 } = c;
-              Swal.fire ({
-                  icon:"success",
-                  title:title,
-                  text:msg,
-                  foot:footer,
-              })
+                Swal.fire({
+                    icon: "success",
+                    title: title,
+                    text: msg,
+                    foot: footer,
+                })
 
-        }
-        let error = function (c) {
-             const {
-                msg = "",
-                title = "",
-                footer = "",
-        } = c;
-        Swal.fire ({
-            icon:'error',
-            title:title,
-            text: msg,
-            footer : footer
-        })
-
-
-
-
-
-        ///////
-        async function custom(c) {
-            const {
-                msg = "",
-                title = "",
-            } = c; // pass here into variable c
-            const {value: formValues} = await Swal.fire({
-                title: 'Multiple inputs',
-                html: msg,
-                backdrop: false,
-                focusConfirm: false,
-                showCancelButton: true,
-                willOpen: () => {
-                    const elm = document.getElementById(`reservation-dates-modal`);
-                    const rp = new DateRangePicker(elem, {
-                        format: 'yyy-mm-dd',
-                        showOnFocus: true,
-                    })
-                },
-                preConfirm: () => {
-                    return [
-                        document.getElementById('start').value,
-                        document.getElementById('end').value
-                    ]
-                },
-                didOpen: () => {
-                    document.getElementById('start').removeAttribute('disabled');
-                    document.getElementById('end').removeAttribute('disabled');
-                }
-            })
-            if (formValues) {
-                Swal.fire(JSON.stringify(formValues))
             }
-        }
-        return {
-            toast: toast,
-            success: success,
-            error: error,
-            custom: custom,
-        }
-        }
+            let error = function (c) {
+                const {
+                    msg = "",
+                    title = "",
+                    footer = "",
+                } = c;
+                Swal.fire({
+                    icon: 'error',
+                    title: title,
+                    text: msg,
+                    footer: footer
+                })
+            }
+
+            ///////
+            async function custom(c) {
+                const {
+                    msg = "",
+                    title = "",
+                } = c; // pass here into variable c
+                const {value: result } = await Swal.fire({
+                    title: title,   // any message specified above would be the message specified here
+                    html: msg,
+                    backdrop: false,
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    willOpen: () => {
+                        if (c.willOpen !== undefined) {
+                            c.willOpen();
+                        }
+                    },
+                    preConfirm: () => {
+                        return [
+                            document.getElementById('start').value,
+                            document.getElementById('end').value
+                        ]
+                    },
+                    didOpen: () => {
+                        if (c.didOpen !== undefined){
+                            c.didOpen()
+                    }
+                }
+                })
+
+              //   pop a box and  show what we enter
+              //   if (formValues) {
+              //       Swal.fire(JSON.stringify(formValues))
+              //   }
+
+                if (result) {
+                    if (result.dismiss !== Swal.DismissReason.cancel) {
+                         if (result !== "") {
+                           if (c.callback !== undefined) {
+                               c.callback(result)
+                           }
+                         }else {
+                             c.callback(false)
+                         }
+                    }else {
+                        c.callback(false)
+                    }
+
+                }
+            }
+
+                return {
+                    toast: toast,
+                    success: success,
+                    error: error,
+                    custom: custom,
+                }
+            }
 
 
 
 
-        //
-        //     function Prompt(c) {
-        //         const {
-        //             msg = "",
-        //             icon = "success",
-        //
-        //             position = "top-end",
-        //         } = c;
-        //
-        //         const Toast = Swal.mixin({
-        //             toast: true,
-        //             title: msg,
-        //             position: position,
-        //             icon:icon,
-        //             showConfirmButton: false,
-        //             timer: 3000,
-        //             timerProgressBar: true,
-        //             didOpen: (toast) => {
-        //                 toast.addEventListener('mouseenter', Swal.stopTimer)
-        //                 toast.addEventListener('mouseleave', Swal.resumeTimer)
-        //             }
-        //         })
-        //
-        //         Toast.fire({})
-        //
-        //
-        //     }
-        //
-        //
-        //     notifyModal("title", "hello", "success", "My text for Button")
-        //
-        //     function notify(msg, msgType) {
-        //         notie.alert({
-        //             type: msgType,
-        //             text: msg,
-        //         })
-        //     }
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //
-        //     if (formValues) {
-        //         Swal.fire(JSON.stringify(formValues))
-        //     }
-        // }
-    </script>
+
+         </script>
 
     </body>
     </html>
-
 {{end}}

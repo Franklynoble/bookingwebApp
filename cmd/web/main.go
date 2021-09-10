@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/Franlky01/bookingwebApp/config"
+	"github.com/Franlky01/bookingwebApp/internal/config"
 
-	"github.com/Franlky01/bookingwebApp/pkg/handlers"
-	"github.com/Franlky01/bookingwebApp/pkg/render"
+	"github.com/Franlky01/bookingwebApp/internal/handlers"
+	"github.com/Franlky01/bookingwebApp/internal/render"
 	"github.com/alexedwards/scs/v2"
 	"log"
 	"net/http"
