@@ -125,8 +125,13 @@ func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) MakeReservations(w http.ResponseWriter, r *http.Request) {
+	var emptyReservation Models.Reservation
+	data := make(map[string]interface{})
+	data["reservation"] = emptyReservation
+
 	render.RenderTemplate(w, r, "make-reservation.page.gohtml", &Models.TemplateData{
 		Form: forms.New(nil),
+		Data: data,
 	})
 }
 
