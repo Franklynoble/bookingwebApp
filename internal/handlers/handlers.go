@@ -5,7 +5,11 @@ import (
 	"fmt"
 	"github.com/Franlky01/bookingwebApp/internal/Models"
 	"github.com/Franlky01/bookingwebApp/internal/config"
+	"github.com/Franlky01/bookingwebApp/internal/driver"
+	"github.com/Franlky01/bookingwebApp/internal/forms"
 	"github.com/Franlky01/bookingwebApp/internal/render"
+	"github.com/Franlky01/bookingwebApp/internal/repository"
+	"github.com/Franlky01/bookingwebApp/internal/repository/dbrepo"
 	"log"
 	"net/http"
 )
@@ -19,13 +23,15 @@ var Repo *Repository
 //  Repository   type repository
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 //NewRepo sets the Repository for the  handlers
 //returns the instance of this type that gholds the application
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a, // create an instance of this type that holds the application
+		DB:  dbrepo.NewpostgresRepo(db.SQL, a),
 	}
 }
 
@@ -120,4 +126,11 @@ func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
 
 func (m *Repository) MakeReservations(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, r, "make-reservation.page.gohtml", &Models.TemplateData{})
+}
+
+// PostReservations handles the posting of reservation form
+func (m *Repository) PostReservations(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, r, "make-reservation.page.gohtml", &Models.TemplateData{
+		Form: forms.New(nil),
+	})
 }
