@@ -125,12 +125,36 @@ func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) MakeReservations(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, "make-reservation.page.gohtml", &Models.TemplateData{})
+	render.RenderTemplate(w, r, "make-reservation.page.gohtml", &Models.TemplateData{
+		Form: forms.New(nil),
+	})
 }
 
 // PostReservations handles the posting of reservation form
 func (m *Repository) PostReservations(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, "make-reservation.page.gohtml", &Models.TemplateData{
-		Form: forms.New(nil),
-	})
+	//render.RenderTemplate(w, r, "make-reservation.page.gohtml", &Models.TemplateData{})
+
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	reservation := Models.Reservation{
+		FirstName: r.Form.Get("first_name"),
+		LastName:  r.Form.Get("last_name"),
+		Email:     r.Form.Get("phone"),
+		Phone:     r.Form.Get("email"),
+	}
+	form := forms.New(r.Form)
+
+	form.Has("first_name", r)
+	if !form.Valid() {
+		data := make(map[string]interface{})
+		data["reservation"] = reservation
+		render.RenderTemplate(w, r, "make-reservation.page.gohtml", &Models.TemplateData{
+			Form: form,
+			Data: data,
+		})
+		return
+	}
 }

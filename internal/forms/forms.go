@@ -51,7 +51,7 @@ func (f *Form) MinLength(field string, length int, r *http.Request) bool {
 func (f *Form) Has(field string, r *http.Request) bool {
 	x := r.Form.Get(field)
 	if x == "" {
-		//f.Errors.Add(field,"this field can not be blank")
+		f.Errors.Add(field, "this field can not be blank")
 		return false
 	}
 	return true
