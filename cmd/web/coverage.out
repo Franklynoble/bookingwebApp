@@ -1,0 +1,12 @@
+mode: set
+github.com/Franlky01/bookingwebApp/cmd/web/routes.go:11.49,40.2 18 1
+github.com/Franlky01/bookingwebApp/cmd/web/main.go:22.13,25.16 2 0
+github.com/Franlky01/bookingwebApp/cmd/web/main.go:32.2,40.16 4 0
+github.com/Franlky01/bookingwebApp/cmd/web/main.go:25.16,27.3 1 0
+github.com/Franlky01/bookingwebApp/cmd/web/main.go:45.18,63.16 10 1
+github.com/Franlky01/bookingwebApp/cmd/web/main.go:68.2,79.12 6 1
+github.com/Franlky01/bookingwebApp/cmd/web/main.go:63.16,66.3 2 0
+github.com/Franlky01/bookingwebApp/cmd/web/middleware.go:10.53,11.72 1 0
+github.com/Franlky01/bookingwebApp/cmd/web/middleware.go:11.72,14.4 2 0
+github.com/Franlky01/bookingwebApp/cmd/web/middleware.go:18.45,27.2 3 1
+github.com/Franlky01/bookingwebApp/cmd/web/middleware.go:32.50,34.2 1 1
