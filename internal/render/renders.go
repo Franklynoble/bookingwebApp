@@ -31,7 +31,7 @@ func NewTemplate(a *config.AppConfig) {
 }
 
 //Renders templates using html Template
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *Models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *Models.TemplateData) error {
 	var tc map[string]*template.Template
 
 	if app.UseCache { //if UseCache is true, use the information from the template TemplateCache
@@ -39,7 +39,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *Mod
 		//get the template cache from the App config
 		tc = app.TemplateCache
 	} else { //else rebuild the templateCache
-		tc, _ = CreateTemplateCache()
+		tc, _ = CreateTestTemplateCache()
 	}
 
 	////creating template cache
@@ -61,6 +61,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *Mod
 	if err != nil {
 		fmt.Println("Error writing template to browser")
 	}
+	return nil
 }
 
 //_, err := RenderTemplatetest(w)
@@ -78,7 +79,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *Mod
 //	}
 //}
 //createTemplateCahed creates template cache as a map
-func CreateTemplateCache() (map[string]*template.Template, error) {
+func CreateTestTemplateCache() (map[string]*template.Template, error) {
 	myCach := map[string]*template.Template{}
 	pages, err := filepath.Glob("./templates/*.page.gohtml")
 	if err != nil {

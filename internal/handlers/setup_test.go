@@ -83,8 +83,8 @@ func getRoutes() http.Handler {
 
 	mux.Get("/contact", Repo.Contact)
 
-	mux.Get("/make-reservation", Repo.MakeReservation)
-	mux.Post("/make-reservation", Repo.PostReservation)
+	mux.Get("/make-reservation", Repo.MakeReservations)
+	mux.Post("/make-reservation", Repo.PostReservations)
 	mux.Get("/reservation-summary", Repo.ReservationSummary)
 	fileServer := http.FileServer(http.Dir("./static/"))
 	//use mux to look for the path name
