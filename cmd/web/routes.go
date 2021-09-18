@@ -31,6 +31,7 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/contact", handlers.Repo.Contact)
 	mux.Get("/make-reservation", handlers.Repo.MakeReservations)
 	mux.Post("/make-reservation", handlers.Repo.PostReservations)
+	mux.Get("/reservation-summary", handlers.Repo.ReservationSummary)
 
 	fileServer := http.FileServer(http.Dir("./static/"))
 	//use mux to look for the path name
