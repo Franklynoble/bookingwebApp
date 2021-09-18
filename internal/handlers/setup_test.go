@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/Franlky01/bookingwebApp/internal/Models"
 	"github.com/Franlky01/bookingwebApp/internal/config"
-	"github.com/Franlky01/bookingwebApp/internal/render"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -56,11 +55,11 @@ func getRoutes() http.Handler {
 	app.TemplateCache = tc
 	app.UseCache = true
 	//created a new repository
-	repo := NewRepo(&app)
+	//	repo := NewRepo(&app)
 	//pass it back to handlers
-	NewHandlers(repo)
+	//NewHandlers(repo)
 
-	render.NewTemplate(&app)
+	//	render.NewTemplate(&app)
 
 	//mux := pat.New()//
 	//mux.Get("/",http.HandlerFunc(Repo.Home))

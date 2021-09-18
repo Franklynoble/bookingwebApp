@@ -2,6 +2,7 @@ package render
 
 import (
 	"github.com/Franlky01/bookingwebApp/internal/Models"
+
 	"net/http"
 	"testing"
 )
@@ -20,7 +21,7 @@ func TestAddDefaultData(t *testing.T) {
 	}
 }
 func TestRenderTemplate(t *testing.T) {
-	pathToTemplate = "./../../templates"
+	pathToTemplates = "./../../templates"
 	tc, err := CreateTestTemplateCache()
 	if err != nil {
 		t.Error(err)
@@ -59,4 +60,15 @@ func getSession() (*http.Request, error) {
 	ctx, _ = session.Load(ctx, r.Header.Get("X-Session"))
 	r = r.WithContext(ctx)
 	return r, nil
+}
+func TestNewTemplates(t *testing.T) {
+	NewTemplate(app)
+}
+
+func TestCreateTemplateCache(t *testing.T) {
+	pathToTemplates = "./../../templates"
+	_, err := CreateTestTemplateCache()
+	if err != nil {
+		t.Error(err)
+	}
 }

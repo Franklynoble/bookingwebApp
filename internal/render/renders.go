@@ -15,6 +15,7 @@ import (
 
 var functions = template.FuncMap{}
 var app *config.AppConfig
+var pathToTemplates = "./templates"
 
 func AddDefaultData(td *Models.TemplateData, r *http.Request) *Models.TemplateData {
 	td.Flash = app.Session.PopString(r.Context(), "flash")

@@ -73,7 +73,7 @@ func run() (*driver.DB, error) {
 	}
 	log.Println("Connected to Database!")
 
-	tc, err := render.CreateTemplateCache()
+	tc, err := render.CreateTestTemplateCache()
 
 	if err != nil {
 		log.Fatal("can not create template cache")
