@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
+	"github.com/Franlky01/bookingwebApp/internal/Models"
 	"github.com/Franlky01/bookingwebApp/internal/config"
 	"github.com/Franlky01/bookingwebApp/internal/driver"
 	"github.com/Franlky01/bookingwebApp/internal/handlers"
@@ -22,12 +24,14 @@ var infoLog *log.Logger
 var errorLog *log.Logger
 
 func main() {
+	gob.Register(Models.Reservation{})
 
-	err := run()
+	db, err := run()
 
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.SQL.Close()
 	//give a function receiver to access the variable
 	//http.HandleFunc("/", handlers.Repo.Home)
 	//http.HandleFunc("/about", handlers.Repo.About)
@@ -42,7 +46,8 @@ func main() {
 	log.Fatal(err)
 
 }
-func run() error {
+func run() (*driver.DB, error) {
+
 	//change this to true when in Production
 	app.InProduction = false
 	session = scs.New()               // creating a new session
@@ -53,36 +58,37 @@ func run() error {
 
 	//adding the session to the appconfig.
 	app.Session = session
-    infoLog := log.New(os.Stdout,"INFO\t", log.Ldate|log.Ltime)
-    app.InfoLog = infoLog
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
 
-	errorLog = log.New(os.Stdout,"Error\t", log.Ldate|log.Ltime|log.Lshortfile)
+	errorLog = log.New(os.Stdout, "Error\t", log.Ldate|log.Ltime|log.Lshortfile)
 	app.ErrorLog = errorLog
 
 	log.Println("Connecting to Database ....")
 
-	db, err := driver.ConnectSQL("host=lodalhost port=5432 dbname=postgres user=postgres password=frank")
+	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=postgres user=postgres password=frank")
 
 	if err != nil {
 		log.Fatal("Can not connect to database Dying...")
 	}
-	defer db.SQL.Close()
+	log.Println("Connected to Database!")
 
 	tc, err := render.CreateTemplateCache()
 
 	if err != nil {
 		log.Fatal("can not create template cache")
+		return nil, err
 	}
 
 	app.TemplateCache = tc
 	app.UseCache = false
 	//created a new repository
-	repo := handlers.NewRepo(&app)
+	repo := handlers.NewRepo(&app, db)
 	//pass it back to handlers
 	handlers.NewHandlers(repo)
 
 	render.NewTemplate(&app)
-	 helpers.NewHelpers(&app)
+	helpers.NewHelpers(&app)
 
-	return nil
+	return db, nil
 }
