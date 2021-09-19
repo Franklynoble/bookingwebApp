@@ -27,12 +27,12 @@ func AddDefaultData(td *Models.TemplateData, r *http.Request) *Models.TemplateDa
 }
 
 //NewTemplate sets the config for the template package
-func NewTemplate(a *config.AppConfig) {
+func NewRenderer(a *config.AppConfig) {
 	app = a // pass the parameter and assign it to pointer to a config.AppConfig
 }
 
 //Renders templates using html Template
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *Models.TemplateData) error {
+func Template(w http.ResponseWriter, r *http.Request, tmpl string, td *Models.TemplateData) error {
 	var tc map[string]*template.Template
 
 	if app.UseCache { //if UseCache is true, use the information from the template TemplateCache

@@ -48,6 +48,9 @@ func main() {
 }
 func run() (*driver.DB, error) {
 
+	gob.Register(Models.Reservation{})
+	gob.Register(Models.User{})
+	gob.Register(Models.Restriction{})
 	//change this to true when in Production
 	app.InProduction = false
 	session = scs.New()               // creating a new session
@@ -87,7 +90,7 @@ func run() (*driver.DB, error) {
 	//pass it back to handlers
 	handlers.NewHandlers(repo)
 
-	render.NewTemplate(&app)
+	render.NewRenderer(&app)
 	helpers.NewHelpers(&app)
 
 	return db, nil
