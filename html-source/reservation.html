@@ -12,7 +12,11 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker-bs4.min.css">
      <link rel="stylesheet" type="text/css" href="/static/css/styles.css">
-
+   <style>
+      .redText{
+          color: red;
+      }
+   </style>
 </head>
 <body>
 
@@ -93,6 +97,13 @@
 
     <div class="row">
 
+        <div class="col">
+            <p id="myParagraph">This is some text</p>
+         <p>
+             <button id="colorButton"  class=" btn btn-outline-secondary">Click me</button>
+
+         </p>
+        </div>
 
     </div>
     <div class="row my-footer">
@@ -259,6 +270,23 @@
             Swal.fire(JSON.stringify(formValues))
         }
     }
+
+
+</script>
+
+
+<script>
+    console.log("i am printing from log")
+   //
+    let myel = document.getElementById("myParagraph");
+   //
+    myel.classList.add("redText");
+    document.getElementById("colorButton").addEventListener("click",function (){
+      if (myel.classList.contains("redText")) {
+        myel.classList.remove("redText")
+      }else {
+          myel.classList.add("redText");
+    }    })
 </script>
 
 </body>

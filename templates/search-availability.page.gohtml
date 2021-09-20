@@ -13,6 +13,7 @@
 
                 <form action="/search-availability" novalidate class="reservation-dates" method="post">
 {{/*                <!--  <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" > -->*/}}
+                    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                     <hr>
                     <!--Date Picker validation--->
                     <div class="form-row">
@@ -34,6 +35,7 @@
 
 
                     <button type="submit" class="btn btn-primary class mt-4">Search Availability</button>
+{{/*                    <input type="submit" id="" class="btn btn-primary" value="Search Availability">*/}}
                 </form>
             </div>
         </div>
