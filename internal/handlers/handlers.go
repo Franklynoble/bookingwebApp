@@ -7,11 +7,14 @@ import (
 	"github.com/Franlky01/bookingwebApp/internal/config"
 	"github.com/Franlky01/bookingwebApp/internal/driver"
 	"github.com/Franlky01/bookingwebApp/internal/forms"
+	"github.com/Franlky01/bookingwebApp/internal/helpers"
 	"github.com/Franlky01/bookingwebApp/internal/render"
 	"github.com/Franlky01/bookingwebApp/internal/repository"
 	"github.com/Franlky01/bookingwebApp/internal/repository/dbrepo"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 //SWAPING COMPONENTWITHIN OUR APPLICATION WITH  MINIMAL
@@ -145,11 +148,37 @@ func (m *Repository) PostReservations(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
+	//date convertion
+	sd := r.Form.Get("start_date")
+	ed := r.Form.Get("end_date")
+	//    01/02 03:04:05PM '06 -0700
+
+	layout := "2006-01-02"
+	startDate, err := time.Parse(layout,sd)
+	if err != nil {
+		helpers.ServerError(w,err)
+	}
+	//layout := "2006-01-02"
+	endDate, err := time.Parse(layout,ed)
+	if err != nil {
+		helpers.ServerError(w,err)
+		return
+	}
+	roomID, err := strconv.Atoi(r.Form.Get("room_id"))
+
+	if err != nil {
+		helpers.ServerError(w,err)
+		return
+	}
+
 	reservation := Models.Reservation{
 		FirstName: r.Form.Get("first_name"),
 		LastName:  r.Form.Get("last_name"),
 		Email:     r.Form.Get("email"),
 		Phone:     r.Form.Get("phone"),
+		StartDate: startDate,
+		EndDate: endDate,
+		RoomID: roomID,
 	}
 	form := forms.New(r.Form)
 
@@ -165,6 +194,25 @@ func (m *Repository) PostReservations(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
+,err = m.DB.InsertReservation(reservation)
+  if err != nil {
+  	helpers.ServerError(w,err)
+  	return
+  }
+  restriction := Models.RoomRestriction{
+	  ID:            0,
+	  Email:         "",
+	  StartDate:     time.Time{},
+	  EndDate:       time.Time{},
+	  RoomID:        0,
+	  ReservationID: 0,
+	  RestrictionID: 0,
+	  CreatedAt:     time.Time{},
+	  UpdatedAt:     time.Time{},
+	  Room:          Models.Room{},
+	  Reservation:   Models.Reservation{},
+	  Restriction:   Models.Restriction{},
+  }
 	m.App.Session.Put(r.Context(), "reservation", reservation)
 	http.Redirect(w, r, "/reservation-summary", http.StatusSeeOther)
 }
