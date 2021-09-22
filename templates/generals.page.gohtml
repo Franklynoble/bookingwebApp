@@ -66,6 +66,7 @@
                     const elem = document.getElementById(`reservation-dates-modal`);
                     const rp = new DateRangePicker(elem, {
                         format: 'yyyy-mm-dd',
+                        minDate: new Date(),
                         showOnFocus: true,
                     });
                 },
@@ -82,22 +83,37 @@
                     form = document.getElementById("check-availability-form");
                     formData = new FormData(form);
                     formData.append("csrf_token", "{{.CSRFToken}}");
+                    formData.append("room_id","1");
 
+                      //method to information posted using fetch
                     fetch('/search-availability-json', {
                         method: "post",
                         body: formData,
+
                     })
 
-                        .then(response => response.json())
+                        .then(response => response.json()) //takes response and Convert it to jason
                         .then(data => {
-                            console.log(data)
+                            if (data.ok) {
+                                attention.custom({
+                                    attention:'success',
+                                      msg: '<p>Room is available!</P>'
+                                             +'<p><a href="#!" class="btn btn-primary">'
+                                               + 'Book now!</a></p>',
+                                })
+                            }else {
+                                attention.error({
+                                    msg: "No availability",
+                                } )
+
+                            }
+                         //   console.log(data)
                             // console.log(fetch.)
-                            console.log(data.ok)
-                            console.log(data.message)
+                           // console.log(data.ok)
+                            //console.log(data.message)
 
                         })
                 }
-
             });
 
         })
