@@ -183,7 +183,7 @@
                     title: msg,
                     position: position,
                     icon: icon,
-                    showConfirmButton: false,
+                    showConfirmButton: false,//to be changed
                     timer: 3000,
                     timerProgressBar: true,
                     didOpen: (toast) => {
@@ -225,19 +225,19 @@
             ///////
             async function custom(c) {
                 const {
-                  //  icon = ""
+                    icon = "",
                     msg = "",
                     title = "",
-                  //  showConfirmButton = true,
+                   showConfirmButton = true,
                 } = c; // pass here into variable c
                 const {value: result } = await Swal.fire({
-                //   icon:icon,
+                   icon:icon,
                     title: title,   // any message specified above would be the message specified here
                     html: msg,
                     backdrop: false,
                     focusConfirm: false,
                     showCancelButton: true,
-                //   showConfirmButton: showConfirmButton,
+                   showConfirmButton: showConfirmButton,
                     willOpen: () => {
                         if (c.willOpen !== undefined) {
                             c.willOpen();
@@ -255,8 +255,8 @@
                     }
                 }
                 })
-
-              //   pop a box and  show what we enter
+              //
+              // //  pop a box and  show what we enter
               //   if (formValues) {
               //       Swal.fire(JSON.stringify(formValues))
               //   }
