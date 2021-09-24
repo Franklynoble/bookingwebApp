@@ -1,60 +1,50 @@
-{{template "base".}}
+{{template "base" .}}
 
 {{define "content"}}
-
-
-
     <div class="container">
 
         <div class="row">
-            <div class="col-md-3"></div>   <!-- Add space the item-->
-            <div class="col-md-6">  <!--Add space in the form-->
-                <h1 class="mt-5">Search Availability</h1>
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <h1 class="mt-5">Search for Availability</h1>
 
-                <form action="/search-availability" novalidate class="reservation-dates" method="post">
-{{/*                <!--  <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" > -->*/}}
+
+                <form action="/search-availability" method="post" novalidate class="needs-validation">
                     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-                    <hr>
-                    <!--Date Picker validation--->
                     <div class="form-row">
                         <div class="col">
-
                             <div class="form-row" id="reservation-dates">
                                 <div class="col">
-                                    <input required class="form-control" type="text" id="reservation-dates"   name="start" placeholder="Arrival">
+                                    <input required class="form-control" type="text" name="start" placeholder="Arrival">
                                 </div>
-
                                 <div class="col">
-                                    <input required class="form-control"  id="reservation-dates" type="text" name="end" placeholder="Departure">
+                                    <input required class="form-control" type="text" name="end" placeholder="Departure">
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
 
+                    <hr>
 
-                    <button type="submit" class="btn btn-primary class mt-4">Search Availability</button>
-{{/*                    <input type="submit" id="" class="btn btn-primary" value="Search Availability">*/}}
+                    <button type="submit" class="btn btn-primary">Search Availability</button>
+
                 </form>
+
             </div>
         </div>
 
-
-</div>
-
-
+    </div>
 {{end}}
 
-{{define "js"}}
- <script>
+{{define "js" }}
 
-     // <!--Date range validtaion---->
-     const elem = document.getElementById('reservation-dates');
-     const rangePicker = new DateRangePicker(elem, {
-         // ...options here date format can be specified here
-         format: "yyyy-mm-dd",
-         minDate:new Date(),
-     });
- </script>
+    <script>
+
+        const elem = document.getElementById('reservation-dates');
+        const rangePicker = new DateRangePicker(elem, {
+            format: "yyyy-mm-dd",
+            minDate: new Date(),
+        });
+
+    </script>
 {{end}}

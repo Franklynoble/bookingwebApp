@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Franlky01/bookingwebApp/internal/Models"
 	"github.com/Franlky01/bookingwebApp/internal/config"
+	"github.com/Franlky01/bookingwebApp/internal/render"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -14,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"testing"
 	"time"
 )
 
@@ -21,6 +23,49 @@ var pathToTemplate = "./../../templates"
 var app config.AppConfig
 var session *scs.SessionManager
 var functions = template.FuncMap{}
+func TestMain(m *testing.M) {
+	//what am i going to store in the session
+	//this would store any value, its and interface
+	gob.Register(Models.Reservation{})
+	//change this to true when in Production
+
+	app.InProduction = false
+
+	//INFO LOGGER
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+	//  these would print to terminal window ldate is a Date in a nice readable format
+	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
+
+	session = scs.New()               // creating a new session
+	session.Lifetime = 24 * time.Hour // how long should the session last
+	session.Cookie.Persist = true     // cookie should persistent even  when browser is closed
+	session.Cookie.SameSite = http.SameSiteLaxMode
+	session.Cookie.Secure = app.InProduction
+
+	//adding the session to the appconfig.
+	app.Session = session
+	tc, err := CreateTestTemplateCache()
+
+	if err != nil {
+		log.Fatal("can not create template cache")
+
+	}
+
+	app.TemplateCache = tc
+	app.UseCache = true
+	//created a new repository
+	repo := NewTestRepo(&app)
+	//pass it back to handlers
+	NewHandlers(repo)
+
+	//to be changed if error >> true
+	render.NewRenderer(&app)
+	//Run before the program dies...
+	os.Exit(m.Run())
+
+}
 
 func getRoutes() http.Handler {
 	//what am i going to store in the session
@@ -55,11 +100,12 @@ func getRoutes() http.Handler {
 	app.TemplateCache = tc
 	app.UseCache = true
 	//created a new repository
-	//	repo := NewRepo(&app)
+	repo := NewTestRepo(&app)
 	//pass it back to handlers
-	//NewHandlers(repo)
+	NewHandlers(repo)
 
-	//	render.NewTemplate(&app)
+	//to be changed if error >> true
+	 render.NewRenderer(&app)
 
 	//mux := pat.New()//
 	//mux.Get("/",http.HandlerFunc(Repo.Home))
@@ -152,3 +198,4 @@ func CreateTestTemplateCache() (map[string]*template.Template, error) {
 	return myCach, nil
 
 }
+func TestR
