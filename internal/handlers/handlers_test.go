@@ -47,7 +47,7 @@ var theTests = []struct {
 	//}, http.StatusOK},
 }
 
-func TestRepository_MakeReservations(t *testing.T) {
+func TestRepository_Reservation(t *testing.T) {
 	reservation := models.Reservation{
 		RoomID: 1,
 		Room: models.Room{

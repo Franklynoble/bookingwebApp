@@ -14,6 +14,7 @@ func routes(app *config.AppConfig) http.Handler {
 	//mux.Get("/about",http.HandlerFunc(handlers.Repo.About))
 
 	mux := chi.NewRouter()
+
 	mux.Use(middleware.Recoverer)
 	mux.Use(NoSurf)
 	mux.Use(SessionLoad)
@@ -32,8 +33,8 @@ func routes(app *config.AppConfig) http.Handler {
 
 	mux.Get("/contact", handlers.Repo.Contact)
 
-	mux.Get("/make-reservation", handlers.Repo.MakeReservations)
-	mux.Post("/make-reservation", handlers.Repo.PostReservations)
+	mux.Get("/make-reservation", handlers.Repo.Reservation)
+	mux.Post("/make-reservation", handlers.Repo.PostReservation)
 	mux.Get("/reservation-summary", handlers.Repo.ReservationSummary)
 
 	fileServer := http.FileServer(http.Dir("./static/"))

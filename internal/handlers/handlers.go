@@ -57,19 +57,19 @@ func NewHandlers(r *Repository) {
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 
 	//pull the remote address of the,
-	remoteIP := r.RemoteAddr
+	//remoteIP := r.RemoteAddr
 	//put the remotadd to the session, using  a key to lookup the value and the value
-	m.App.Session.Put(r.Context(), "remote_ip", remoteIP)
+	//m.App.Session.Put(r.Context(), "remote_ip", remoteIP)
 
 	render.Template(w, r, "home.page.gohtml", &models.TemplateData{})
 }
 
 //about is the about handler
 func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
-	stringMap := make(map[string]string)
+	//stringMap := make(map[string]string)
 
-	remoteIP := m.App.Session.GetString(r.Context(), "remote_ip")
-	stringMap["remote_ip"] = remoteIP
+	//remoteIP := m.App.Session.GetString(r.Context(), "remote_ip")
+	//stringMap["remote_ip"] = remoteIP
 	//stringMap["test"] = "hello, aGain"
 
 	//add data Business Logic
@@ -77,19 +77,12 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 	//pull the value out of the session
 	//remoteIP := m.App.Session.GetString(r.Context(),"remote_ip")
 	//    stringMap["remote_ip"] = remoteIP
-	render.Template(w, r, "about.page.gohtml", &models.TemplateData{
-		StringMap: stringMap,
-	})
+	render.Template(w, r, "about.page.gohtml", &models.TemplateData{})
 }
 
 //Generals renders the  generals room page
 func (m *Repository) Generals(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "generals.page.gohtml", &models.TemplateData{})
-}
-
-// Reservation renders the make a reservation page and displays form
-func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
-	render.Template(w, r, "make-reservation.page.gohtml", &models.TemplateData{})
 }
 
 //Majors renders the room Page
@@ -206,8 +199,8 @@ func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "contact.page.gohtml", &models.TemplateData{})
 }
 
-//MakeReservations renders the make reservation page and displays
-func (m *Repository) MakeReservations(w http.ResponseWriter, r *http.Request) {
+//Reservation renders the make reservation page and displays
+func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
 		m.App.Session.Put(r.Context(), "error", "can't get reservation from session")
@@ -242,8 +235,8 @@ func (m *Repository) MakeReservations(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// PostReservations handles the posting of reservation form
-func (m *Repository) PostReservations(w http.ResponseWriter, r *http.Request) {
+// PostReservation handles the posting of reservation form
+func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	//render.render.Template(w, r, "make-reservation.page.gohtml", &models.TemplateData{})
 	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
