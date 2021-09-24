@@ -68,7 +68,6 @@ func (m *postgresDBRepo) SearchAvailabilityByDatesByRoomID(start, end time.Time,
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-
 	/*
 		---existing reservation from 2021-02-03 to 2021-02-05
 			---search date is exactly the same as existing reservation

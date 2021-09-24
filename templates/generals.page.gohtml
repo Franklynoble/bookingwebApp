@@ -1,4 +1,4 @@
-{{template "base" .}}
+{{template "base".}}
 
 
 {{define "content"}}
@@ -42,9 +42,7 @@
 {{define "js"}}
     <script>
         document.getElementById("check-availability-button").addEventListener("click", function () {
-            let html = `
-        <form id="check-availability-form" action="" method="post" novalidate class="needs-validation">
-
+            let html =` <form id="check-availability-form" action="" method="post" novalidate class="needs-validation">
            <div class="form-row">
                     <div class="col">
                    <div class="form-row" id="reservation-dates-modal">
@@ -63,7 +61,7 @@
                 title: "choose your dates",
                 // this function is passed to the will open in the prompt func in the  base page
                 willOpen: () => {
-                    const elem = document.getElementById(`reservation-dates-modal`);
+                    const elem = document.getElementById("reservation-dates-modal");
                     const rp = new DateRangePicker(elem, {
                         format: 'yyyy-mm-dd',
                         minDate: new Date(),
@@ -71,38 +69,45 @@
                     });
                 },
                 didOpen: () => {
-                    document.getElementById('start').removeAttribute('disabled');
-                    document.getElementById('end').removeAttribute('disabled');
+                   document.getElementById('start').removeAttribute('disabled');
+                   document.getElementById('end').removeAttribute('disabled');
                 },
 
                 callback: function (result) {
-                    var form;
-                    var formData;
+
                     console.log("called");
 
-                    form = document.getElementById("check-availability-form");
-                    formData = new FormData(form);
+                   let form = document.getElementById("check-availability-form");
+                   let formData = new FormData(form);
                     formData.append("csrf_token", "{{.CSRFToken}}");
                     formData.append("room_id", "1");
 
-                    //method to information posted using fetch
+
+                    //method to information posted using fetch, append the data
                     fetch('/search-availability-json', {
                         method: "post",
                         body: formData,
-
-
                     })
 
-                        .then(response => response.json()) //takes response and Convert it to jason
-                        .then(data => {
-                            if (data.ok) {
+
+                .then(response => response.json()) //takes response and Convert it to jason
+                .then(data => {
+                         if (data.ok) {
                                 attention.custom({
+
                                     icon:'success',
-                                    attention: 'success',
+                                  //  attention: 'success',
                                     showConfirmButton: false,
+
                                     msg: '<p>Room is available!</P>'
-                                        + '<p><a href="#!" class="btn btn-primary">'
-                                        + 'Book now!</a></p>',
+                                          + '<p><a href="/book-room?id='
+                                          + data.room_id
+                                          + "&s="
+                                          +  data.start_date
+                                          + "&e="
+                                          + data.end_date
+                                          + '" class="btn btn-primary">'
+                                          + 'Book now!</a></p>',
                                 })
                             } else {
                                 attention.error({
@@ -110,10 +115,7 @@
                                 })
 
                             }
-                            //   console.log(data)
-                            // console.log(fetch.)
-                            // console.log(data.ok)
-                            //console.log(data.message)
+
 
                         })
                 }

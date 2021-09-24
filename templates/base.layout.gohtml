@@ -162,6 +162,12 @@
             {{end}}
 
         {{with.Flash}}
+        notify("{{.}}","success")
+        {{end}}
+
+
+
+        {{with.Flash}}
         notify("{{.}}","flash")
         {{end}}
 
@@ -264,7 +270,7 @@
 
                 if (result) {
                     if (result.dismiss !== Swal.DismissReason.cancel) {
-                         if (result !== "") {
+                         if (result.value !== "") {
                            if (c.callback !== undefined) {
                                c.callback(result)
                            }
