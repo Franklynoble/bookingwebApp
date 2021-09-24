@@ -3,11 +3,11 @@ package main
 import (
 	"encoding/gob"
 	"fmt"
-	"github.com/Franlky01/bookingwebApp/internal/Models"
 	"github.com/Franlky01/bookingwebApp/internal/config"
 	"github.com/Franlky01/bookingwebApp/internal/driver"
 	"github.com/Franlky01/bookingwebApp/internal/handlers"
 	"github.com/Franlky01/bookingwebApp/internal/helpers"
+	"github.com/Franlky01/bookingwebApp/internal/models"
 	"github.com/Franlky01/bookingwebApp/internal/render"
 	"github.com/alexedwards/scs/v2"
 	"log"
@@ -24,7 +24,7 @@ var infoLog *log.Logger
 var errorLog *log.Logger
 
 func main() {
-	gob.Register(Models.Reservation{})
+	gob.Register(models.Reservation{})
 
 	db, err := run()
 
@@ -48,9 +48,9 @@ func main() {
 }
 func run() (*driver.DB, error) {
 
-	gob.Register(Models.Reservation{})
-	gob.Register(Models.User{})
-	gob.Register(Models.Restriction{})
+	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Restriction{})
 	//change this to true when in Production
 	app.InProduction = false
 	session = scs.New()               // creating a new session

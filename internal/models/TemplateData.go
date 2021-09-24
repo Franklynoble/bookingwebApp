@@ -1,4 +1,4 @@
-package Models
+package models
 
 import "github.com/Franlky01/bookingwebApp/internal/forms"
 

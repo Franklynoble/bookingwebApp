@@ -1,7 +1,7 @@
 package dbrepo
 
 import (
-	"github.com/Franlky01/bookingwebApp/internal/Models"
+	"github.com/Franlky01/bookingwebApp/internal/models"
 	"time"
 )
 
@@ -10,13 +10,13 @@ func (m *testDBRepo) AllUsers() bool {
 }
 
 //InsertReservation insertes reservation into database
-func (m *testDBRepo) InsertReservation(res Models.Reservation) (int, error) {
+func (m *testDBRepo) InsertReservation(res models.Reservation) (int, error) {
 
 	return 1, nil
 }
 
 //InsertRoomRestriction inserts a room restriction into the Database
-func (m *testDBRepo) InsertRoomRestriction(r Models.RoomRestriction) error {
+func (m *testDBRepo) InsertRoomRestriction(r models.RoomRestriction) error {
 
 	return nil
 }
@@ -29,13 +29,13 @@ func (m *testDBRepo) SearchAvailabilityByDatesByRoomID(start, end time.Time, roo
 }
 
 //SearchAvailabilityForAllRooms returns  a slice of available rooms, if any, for given Date Range
-func (m *testDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]Models.Room, error) {
+func (m *testDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]models.Room, error) {
 
-	var rooms []Models.Room
+	var rooms []models.Room
 	return rooms, nil
 }
 
-func (m *testDBRepo) GetRoomByID(id int) (Models.Room, error) {
-	var room Models.Room
+func (m *testDBRepo) GetRoomByID(id int) (models.Room, error) {
+	var room models.Room
 	return room, nil
 }

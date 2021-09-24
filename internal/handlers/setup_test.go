@@ -3,8 +3,8 @@ package handlers
 import (
 	"encoding/gob"
 	"fmt"
-	"github.com/Franlky01/bookingwebApp/internal/Models"
 	"github.com/Franlky01/bookingwebApp/internal/config"
+	"github.com/Franlky01/bookingwebApp/internal/models"
 	"github.com/Franlky01/bookingwebApp/internal/render"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
@@ -23,10 +23,11 @@ var pathToTemplate = "./../../templates"
 var app config.AppConfig
 var session *scs.SessionManager
 var functions = template.FuncMap{}
+
 func TestMain(m *testing.M) {
 	//what am i going to store in the session
 	//this would store any value, its and interface
-	gob.Register(Models.Reservation{})
+	gob.Register(models.Reservation{})
 	//change this to true when in Production
 
 	app.InProduction = false
@@ -70,7 +71,7 @@ func TestMain(m *testing.M) {
 func getRoutes() http.Handler {
 	//what am i going to store in the session
 	//this would store any value, its and interface
-	gob.Register(Models.Reservation{})
+	gob.Register(models.Reservation{})
 	//change this to true when in Production
 
 	app.InProduction = false
@@ -105,7 +106,7 @@ func getRoutes() http.Handler {
 	NewHandlers(repo)
 
 	//to be changed if error >> true
-	 render.NewRenderer(&app)
+	render.NewRenderer(&app)
 
 	//mux := pat.New()//
 	//mux.Get("/",http.HandlerFunc(Repo.Home))
@@ -198,4 +199,3 @@ func CreateTestTemplateCache() (map[string]*template.Template, error) {
 	return myCach, nil
 
 }
-func TestR

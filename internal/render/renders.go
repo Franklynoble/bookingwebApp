@@ -3,8 +3,8 @@ package render
 import (
 	"bytes"
 	"fmt"
-	"github.com/Franlky01/bookingwebApp/internal/Models"
 	"github.com/Franlky01/bookingwebApp/internal/config"
+	"github.com/Franlky01/bookingwebApp/internal/models"
 	"github.com/justinas/nosurf"
 
 	"html/template"
@@ -17,7 +17,7 @@ var functions = template.FuncMap{}
 var app *config.AppConfig
 var pathToTemplates = "./templates"
 
-func AddDefaultData(td *Models.TemplateData, r *http.Request) *Models.TemplateData {
+func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
 	td.Flash = app.Session.PopString(r.Context(), "flash")
 	td.Error = app.Session.PopString(r.Context(), "error")
 	td.Warning = app.Session.PopString(r.Context(), "warning")
@@ -32,7 +32,7 @@ func NewRenderer(a *config.AppConfig) {
 }
 
 //Renders templates using html Template
-func Template(w http.ResponseWriter, r *http.Request, tmpl string, td *Models.TemplateData) error {
+func Template(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
 	var tc map[string]*template.Template
 
 	if app.UseCache { //if UseCache is true, use the information from the template TemplateCache

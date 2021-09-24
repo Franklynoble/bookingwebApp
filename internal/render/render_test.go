@@ -1,14 +1,14 @@
 package render
 
 import (
-	"github.com/Franlky01/bookingwebApp/internal/Models"
+	"github.com/Franlky01/bookingwebApp/internal/models"
 
 	"net/http"
 	"testing"
 )
 
 func TestAddDefaultData(t *testing.T) {
-	var td Models.TemplateData
+	var td models.TemplateData
 	r, err := getSession()
 	if err != nil {
 		t.Error(err)
@@ -34,11 +34,11 @@ func TestRenderTemplate(t *testing.T) {
 	}
 
 	var ww myWriter
-	err = Template(&ww, r, "home.page.gohtml", &Models.TemplateData{})
+	err = Template(&ww, r, "home.page.gohtml", &models.TemplateData{})
 	if err != nil {
 		t.Error("error writing template to browser")
 	}
-	err = Template(&ww, r, "non-existent.page.gohtml", &Models.TemplateData{})
+	err = Template(&ww, r, "non-existent.page.gohtml", &models.TemplateData{})
 	if err == nil {
 		t.Error("rendered template that does not exist")
 	}

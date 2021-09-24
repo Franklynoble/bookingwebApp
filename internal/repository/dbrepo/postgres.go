@@ -2,7 +2,7 @@ package dbrepo
 
 import (
 	"context"
-	"github.com/Franlky01/bookingwebApp/internal/Models"
+	"github.com/Franlky01/bookingwebApp/internal/models"
 	"time"
 )
 
@@ -11,7 +11,7 @@ func (m *postgresDBRepo) AllUsers() bool {
 }
 
 //InsertReservation insertes reservation into database
-func (m *postgresDBRepo) InsertReservation(res Models.Reservation) (int, error) {
+func (m *postgresDBRepo) InsertReservation(res models.Reservation) (int, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -38,7 +38,7 @@ func (m *postgresDBRepo) InsertReservation(res Models.Reservation) (int, error) 
 }
 
 //InsertRoomRestriction inserts a room restriction into the Database
-func (m *postgresDBRepo) InsertRoomRestriction(r Models.RoomRestriction) error {
+func (m *postgresDBRepo) InsertRoomRestriction(r models.RoomRestriction) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -97,12 +97,12 @@ func (m *postgresDBRepo) SearchAvailabilityByDatesByRoomID(start, end time.Time,
 }
 
 //SearchAvailabilityForAllRooms returns  a slice of available rooms, if any, for given Date Range
-func (m *postgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]Models.Room, error) {
+func (m *postgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]models.Room, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	var rooms []Models.Room
+	var rooms []models.Room
 	query := `select 
 r.id, r.room_name
 from
@@ -115,7 +115,7 @@ where   r.id not in
 		return rooms, err
 	}
 	for rows.Next() {
-		var room Models.Room
+		var room models.Room
 		err := rows.Scan(&room.ID,
 			&room.RoomName,
 		)
@@ -133,11 +133,11 @@ where   r.id not in
 }
 
 //GetsRoomByID gets a roomby id
-func (m *postgresDBRepo) GetRoomByID(id int) (Models.Room, error) {
+func (m *postgresDBRepo) GetRoomByID(id int) (models.Room, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	var room Models.Room
+	var room models.Room
 
 	query := `select id, room_name, created_at, updated_at from rooms where id=$1`
 	row := m.DB.QueryRowContext(ctx, query, id)

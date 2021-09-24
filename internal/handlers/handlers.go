@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Franlky01/bookingwebApp/internal/Models"
 	"github.com/Franlky01/bookingwebApp/internal/config"
 	"github.com/Franlky01/bookingwebApp/internal/driver"
 	"github.com/Franlky01/bookingwebApp/internal/forms"
 	"github.com/Franlky01/bookingwebApp/internal/helpers"
+	"github.com/Franlky01/bookingwebApp/internal/models"
 	"github.com/Franlky01/bookingwebApp/internal/render"
 	"github.com/Franlky01/bookingwebApp/internal/repository"
 	"github.com/Franlky01/bookingwebApp/internal/repository/dbrepo"
@@ -61,7 +61,7 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	//put the remotadd to the session, using  a key to lookup the value and the value
 	m.App.Session.Put(r.Context(), "remote_ip", remoteIP)
 
-	render.Template(w, r, "home.page.gohtml", &Models.TemplateData{})
+	render.Template(w, r, "home.page.gohtml", &models.TemplateData{})
 }
 
 //about is the about handler
@@ -77,29 +77,29 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 	//pull the value out of the session
 	//remoteIP := m.App.Session.GetString(r.Context(),"remote_ip")
 	//    stringMap["remote_ip"] = remoteIP
-	render.Template(w, r, "about.page.gohtml", &Models.TemplateData{
+	render.Template(w, r, "about.page.gohtml", &models.TemplateData{
 		StringMap: stringMap,
 	})
 }
 
 //Generals renders the  generals room page
 func (m *Repository) Generals(w http.ResponseWriter, r *http.Request) {
-	render.Template(w, r, "generals.page.gohtml", &Models.TemplateData{})
+	render.Template(w, r, "generals.page.gohtml", &models.TemplateData{})
 }
 
 // Reservation renders the make a reservation page and displays form
 func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
-	render.Template(w, r, "make-reservation.page.gohtml", &Models.TemplateData{})
+	render.Template(w, r, "make-reservation.page.gohtml", &models.TemplateData{})
 }
 
 //Majors renders the room Page
 func (m *Repository) Majors(w http.ResponseWriter, r *http.Request) {
-	render.Template(w, r, "majors.page.gohtml", &Models.TemplateData{})
+	render.Template(w, r, "majors.page.gohtml", &models.TemplateData{})
 }
 
 // Availability renders the  search availability Page
 func (m *Repository) Availability(w http.ResponseWriter, r *http.Request) {
-	render.Template(w, r, "search-availability.page.gohtml", &Models.TemplateData{})
+	render.Template(w, r, "search-availability.page.gohtml", &models.TemplateData{})
 }
 
 // PostAvailability renders the  search availability Page
@@ -147,7 +147,7 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["rooms"] = rooms
 	// get start, and end date to be added to session
-	res := Models.Reservation{
+	res := models.Reservation{
 
 		StartDate: startDate,
 		EndDate:   endDate,
@@ -155,7 +155,7 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 	//Add the res to Session
 	m.App.Session.Put(r.Context(), "reservation", res)
 
-	render.Template(w, r, "choose-room.page.gohtml", &Models.TemplateData{
+	render.Template(w, r, "choose-room.page.gohtml", &models.TemplateData{
 		Data: data,
 	})
 
@@ -203,19 +203,21 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
-	render.Template(w, r, "contact.page.gohtml", &Models.TemplateData{})
+	render.Template(w, r, "contact.page.gohtml", &models.TemplateData{})
 }
 
 //MakeReservations renders the make reservation page and displays
 func (m *Repository) MakeReservations(w http.ResponseWriter, r *http.Request) {
-	res, ok := m.App.Session.Get(r.Context(), "reservation").(Models.Reservation)
+	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		helpers.ServerError(w, errors.New("cannot get reservation from session"))
+		m.App.Session.Put(r.Context(), "error", "can't get reservation from session")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 	room, err := m.DB.GetRoomByID(res.RoomID)
 	if err != nil {
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "can't get room!")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -229,11 +231,11 @@ func (m *Repository) MakeReservations(w http.ResponseWriter, r *http.Request) {
 	stringMap["start_date"] = sd
 	stringMap["end_date"] = ed
 
-	//var emptyReservation Models.Reservation
+	//var emptyReservation models.Reservation
 	data := make(map[string]interface{})
 	data["reservation"] = res
 
-	render.Template(w, r, "make-reservation.page.gohtml", &Models.TemplateData{
+	render.Template(w, r, "make-reservation.page.gohtml", &models.TemplateData{
 		Form:      forms.New(nil),
 		Data:      data,
 		StringMap: stringMap,
@@ -242,8 +244,8 @@ func (m *Repository) MakeReservations(w http.ResponseWriter, r *http.Request) {
 
 // PostReservations handles the posting of reservation form
 func (m *Repository) PostReservations(w http.ResponseWriter, r *http.Request) {
-	//render.render.Template(w, r, "make-reservation.page.gohtml", &Models.TemplateData{})
-	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(Models.Reservation)
+	//render.render.Template(w, r, "make-reservation.page.gohtml", &models.TemplateData{})
+	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
 		helpers.ServerError(w, errors.New("can't get from session"))
 		return
@@ -267,7 +269,7 @@ func (m *Repository) PostReservations(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
-		render.Template(w, r, "make-reservation.page.gohtml", &Models.TemplateData{
+		render.Template(w, r, "make-reservation.page.gohtml", &models.TemplateData{
 			Form: form,
 			Data: data,
 		})
@@ -279,7 +281,7 @@ func (m *Repository) PostReservations(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	restriction := Models.RoomRestriction{
+	restriction := models.RoomRestriction{
 
 		StartDate:     reservation.StartDate,
 		EndDate:       reservation.EndDate,
@@ -300,7 +302,7 @@ func (m *Repository) PostReservations(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
-	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(Models.Reservation)
+	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 
 	if !ok {
 		log.Println("cannot get item from session")
@@ -320,7 +322,7 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 	stringMap["start_date"] = sd
 	stringMap["end_date"] = ed
 
-	render.Template(w, r, "reservation-summary.page.gohtml", &Models.TemplateData{
+	render.Template(w, r, "reservation-summary.page.gohtml", &models.TemplateData{
 		Data:      data,
 		StringMap: stringMap,
 	})
@@ -335,7 +337,7 @@ func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//get reservation from Session
-	res, ok := m.App.Session.Get(r.Context(), "reservation").(Models.Reservation)
+	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
 		helpers.ServerError(w, err)
 		return
@@ -358,7 +360,7 @@ func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 	startDate, _ := time.Parse(layout, sd)
 	endDate, _ := time.Parse(layout, ed)
 
-	var res Models.Reservation
+	var res models.Reservation
 	//error to be handled
 	room, _ := m.DB.GetRoomByID(res.RoomID)
 	//if err != nil {

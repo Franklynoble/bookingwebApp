@@ -2,8 +2,8 @@ package render
 
 import (
 	"encoding/gob"
-	"github.com/Franlky01/bookingwebApp/internal/Models"
 	"github.com/Franlky01/bookingwebApp/internal/config"
+	"github.com/Franlky01/bookingwebApp/internal/models"
 	"github.com/alexedwards/scs/v2"
 	"log"
 	"net/http"
@@ -20,7 +20,7 @@ func TestMain(m *testing.M) {
 	//what am i going to store in the session
 
 	//this would store any value, its and interface
-	gob.Register(Models.Reservation{})
+	gob.Register(models.Reservation{})
 	//change this to true when in Production
 
 	testApp.InProduction = false
