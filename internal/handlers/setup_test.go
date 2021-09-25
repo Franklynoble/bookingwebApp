@@ -3,13 +3,13 @@ package handlers
 import (
 	"encoding/gob"
 	"fmt"
-	"github.com/Franlky01/bookingwebApp/internal/config"
-	"github.com/Franlky01/bookingwebApp/internal/models"
-	"github.com/Franlky01/bookingwebApp/internal/render"
 	"github.com/alexedwards/scs/v2"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/justinas/nosurf"
+	"github.com/tsawler/bookings/internal/config"
+	"github.com/tsawler/bookings/internal/models"
+	"github.com/tsawler/bookings/internal/render"
 	"html/template"
 	"log"
 	"net/http"
@@ -19,108 +19,56 @@ import (
 	"time"
 )
 
-var pathToTemplate = "./../../templates"
 var app config.AppConfig
 var session *scs.SessionManager
+var pathToTemplates = "./../../templates"
 var functions = template.FuncMap{}
 
 func TestMain(m *testing.M) {
-	//what am i going to store in the session
-	//this would store any value, its and interface
 	gob.Register(models.Reservation{})
-	//change this to true when in Production
 
+	// change this to true when in production
 	app.InProduction = false
 
-	//INFO LOGGER
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.InfoLog = infoLog
-	//  these would print to terminal window ldate is a Date in a nice readable format
+
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 	app.ErrorLog = errorLog
 
-	session = scs.New()               // creating a new session
-	session.Lifetime = 24 * time.Hour // how long should the session last
-	session.Cookie.Persist = true     // cookie should persistent even  when browser is closed
+	session = scs.New()
+	session.Lifetime = 24 * time.Hour
+	session.Cookie.Persist = true
 	session.Cookie.SameSite = http.SameSiteLaxMode
 	session.Cookie.Secure = app.InProduction
 
-	//adding the session to the appconfig.
 	app.Session = session
+
 	tc, err := CreateTestTemplateCache()
-
 	if err != nil {
-		log.Fatal("can not create template cache")
-
+		log.Fatal("cannot create template cache")
 	}
 
 	app.TemplateCache = tc
 	app.UseCache = true
-	//created a new repository
+
 	repo := NewTestRepo(&app)
-	//pass it back to handlers
 	NewHandlers(repo)
-
-	//to be changed if error >> true
 	render.NewRenderer(&app)
-	//Run before the program dies...
-	os.Exit(m.Run())
 
+	os.Exit(m.Run())
 }
 
 func getRoutes() http.Handler {
-	//what am i going to store in the session
-	//this would store any value, its and interface
-	gob.Register(models.Reservation{})
-	//change this to true when in Production
-
-	app.InProduction = false
-
-	//INFO LOGGER
-	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
-	app.InfoLog = infoLog
-	//  these would print to terminal window ldate is a Date in a nice readable format
-	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
-	app.ErrorLog = errorLog
-
-	session = scs.New()               // creating a new session
-	session.Lifetime = 24 * time.Hour // how long should the session last
-	session.Cookie.Persist = true     // cookie should persistent even  when browser is closed
-	session.Cookie.SameSite = http.SameSiteLaxMode
-	session.Cookie.Secure = app.InProduction
-
-	//adding the session to the appconfig.
-	app.Session = session
-	tc, err := CreateTestTemplateCache()
-
-	if err != nil {
-		log.Fatal("can not create template cache")
-
-	}
-
-	app.TemplateCache = tc
-	app.UseCache = true
-	//created a new repository
-	repo := NewTestRepo(&app)
-	//pass it back to handlers
-	NewHandlers(repo)
-
-	//to be changed if error >> true
-	render.NewRenderer(&app)
-
-	//mux := pat.New()//
-	//mux.Get("/",http.HandlerFunc(Repo.Home))
-	//mux.Get("/about",http.HandlerFunc(Repo.About))
-
 	mux := chi.NewRouter()
+
 	mux.Use(middleware.Recoverer)
-	//	mux.Use(NoSurf)
+	//mux.Use(NoSurf)
 	mux.Use(SessionLoad)
+
 	mux.Get("/", Repo.Home)
 	mux.Get("/about", Repo.About)
-
 	mux.Get("/generals-quarters", Repo.Generals)
-
 	mux.Get("/majors-suite", Repo.Majors)
 
 	mux.Get("/search-availability", Repo.Availability)
@@ -132,70 +80,62 @@ func getRoutes() http.Handler {
 	mux.Get("/make-reservation", Repo.Reservation)
 	mux.Post("/make-reservation", Repo.PostReservation)
 	mux.Get("/reservation-summary", Repo.ReservationSummary)
-	fileServer := http.FileServer(http.Dir("./static/"))
-	//use mux to look for the path name
-	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
-	return mux
 
+	fileServer := http.FileServer(http.Dir("./static/"))
+	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
+
+	return mux
 }
 
-//NoSurf adds CSRF protection to all Post Request
+// NoSurf adds CSRF protection to all POST requests
 func NoSurf(next http.Handler) http.Handler {
-	crsfHanlder := nosurf.New(next)
-	crsfHanlder.SetBaseCookie(http.Cookie{
+	csrfHandler := nosurf.New(next)
+
+	csrfHandler.SetBaseCookie(http.Cookie{
 		HttpOnly: true,
-		Path:     "/", // for perPage bases, the entire site
+		Path:     "/",
 		Secure:   app.InProduction,
 		SameSite: http.SameSiteLaxMode,
 	})
-	return crsfHanlder
+	return csrfHandler
 }
 
-//loads and saves the session on every session
-//tell the webapp to remember state using session
+// SessionLoad loads and saves the session on every request
 func SessionLoad(next http.Handler) http.Handler {
 	return session.LoadAndSave(next)
 }
 
-//createTemplateCahed creates template cache as a map
+// CreateTestTemplateCache creates a template cache as a map
 func CreateTestTemplateCache() (map[string]*template.Template, error) {
-	myCach := map[string]*template.Template{}
-	pages, err := filepath.Glob(fmt.Sprintf("%s/*.page.gohtml", pathToTemplate))
-	if err != nil {
-		return myCach, err
-	}
 
-	//for every page found, the first page it would find using the index stating from 0 value
-	// the pages here is the collection of  the file found in this variable
+	myCache := map[string]*template.Template{}
+
+	pages, err := filepath.Glob(fmt.Sprintf("%s/*.page.tmpl", pathToTemplates))
+	if err != nil {
+		return myCache, err
+	}
 
 	for _, page := range pages {
-		//return the full Path to the file
-		name := filepath.Base(page) //here we get the base name
-
-		fmt.Println("Page is currently on the page", page)
+		name := filepath.Base(page)
 		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
-			return myCach, err
-
+			return myCache, err
 		}
 
-		//if match it would be greater than zero
-		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.gohtml", pathToTemplate))
+		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
 		if err != nil {
-			return myCach, err
+			return myCache, err
 		}
 
-		//test for the length
 		if len(matches) > 0 {
-			ts, err = ts.ParseGlob(fmt.Sprintf("%s/*.layout.gohtml", pathToTemplate))
+			ts, err = ts.ParseGlob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
 			if err != nil {
-				return myCach, err
+				return myCache, err
 			}
-
 		}
-		myCach[name] = ts
+
+		myCache[name] = ts
 	}
 
-	return myCach, nil
-
+	return myCache, nil
 }

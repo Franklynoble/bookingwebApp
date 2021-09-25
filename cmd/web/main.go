@@ -6,10 +6,11 @@ import (
 	"github.com/Franlky01/bookingwebApp/internal/config"
 	"github.com/Franlky01/bookingwebApp/internal/driver"
 	"github.com/Franlky01/bookingwebApp/internal/handlers"
-	"github.com/Franlky01/bookingwebApp/internal/helpers"
 	"github.com/Franlky01/bookingwebApp/internal/models"
 	"github.com/Franlky01/bookingwebApp/internal/render"
+	"github.com/Franlky01/bookingwebApp/static/helpers"
 	"github.com/alexedwards/scs/v2"
+
 	"log"
 	"net/http"
 	"os"
@@ -23,73 +24,68 @@ var session *scs.SessionManager
 var infoLog *log.Logger
 var errorLog *log.Logger
 
+// main is the main application function
 func main() {
-	gob.Register(models.Reservation{})
-
 	db, err := run()
-
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.SQL.Close()
-	//give a function receiver to access the variable
-	//http.HandleFunc("/", handlers.Repo.Home)
-	//http.HandleFunc("/about", handlers.Repo.About)
-	fmt.Println(fmt.Sprintf("starting application at %s", portNumber))
-	//http.ListenAndServe(portNumber, nil)
 
-	serve := &http.Server{
+	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
+
+	srv := &http.Server{
 		Addr:    portNumber,
 		Handler: routes(&app),
 	}
-	err = serve.ListenAndServe()
+
+	err = srv.ListenAndServe()
 	log.Fatal(err)
-
 }
-func run() (*driver.DB, error) {
 
+func run() (*driver.DB, error) {
+	// what am I going to put in the session
 	gob.Register(models.Reservation{})
 	gob.Register(models.User{})
+	gob.Register(models.Room{})
 	gob.Register(models.Restriction{})
-	//change this to true when in Production
+
+	// change this to true when in production
 	app.InProduction = false
-	session = scs.New()               // creating a new session
-	session.Lifetime = 24 * time.Hour // how long should the session last
-	session.Cookie.Persist = true     // cookie should persistent even  when browser is closed
+
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
+
+	session = scs.New()
+	session.Lifetime = 24 * time.Hour
+	session.Cookie.Persist = true
 	session.Cookie.SameSite = http.SameSiteLaxMode
 	session.Cookie.Secure = app.InProduction
 
-	//adding the session to the appconfig.
 	app.Session = session
-	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
-	app.InfoLog = infoLog
 
-	errorLog = log.New(os.Stdout, "Error\t", log.Ldate|log.Ltime|log.Lshortfile)
-	app.ErrorLog = errorLog
-
-	log.Println("Connecting to Database ....")
-
+	// connect to database
+	log.Println("Connecting to database...")
 	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=postgres user=postgres password=frank")
-
 	if err != nil {
-		log.Fatal("Can not connect to database Dying...")
+		log.Fatal("Cannot connect to database! Dying...")
 	}
-	log.Println("Connected to Database!")
+	log.Println("Connected to database!")
 
-	tc, err := render.CreateTestTemplateCache()
-
+	tc, err := render.CreateTemplateCache()
 	if err != nil {
-		log.Fatal("can not create template cache")
+		log.Fatal("cannot create template cache")
 		return nil, err
 	}
 
 	app.TemplateCache = tc
 	app.UseCache = false
-	//created a new repository
-	repo := handlers.NewRepo(&app, db)
-	//pass it back to handlers
-	handlers.NewHandlers(repo)
 
+	repo := handlers.NewRepo(&app, db)
+	handlers.NewHandlers(repo)
 	render.NewRenderer(&app)
 	helpers.NewHelpers(&app)
 
