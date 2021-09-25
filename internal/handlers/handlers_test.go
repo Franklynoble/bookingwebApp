@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/tsawler/bookings/internal/driver"
-	"github.com/tsawler/bookings/internal/models"
+	"github.com/Franlky01/bookingwebApp/internal/config"
+	"github.com/Franlky01/bookingwebApp/internal/models"
+
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -290,8 +291,9 @@ func TestRepository_PostReservation(t *testing.T) {
 }
 
 func TestNewRepo(t *testing.T) {
-	var db driver.DB
-	testRepo := NewRepo(&app, &db)
+	//var db driver.DB
+	var ap config.AppConfig
+	testRepo := NewTestRepo(&ap)
 
 	if reflect.TypeOf(testRepo).String() != "*handlers.Repository" {
 		t.Errorf("Did not get correct type from NewRepo: got %s, wanted *Repository", reflect.TypeOf(testRepo).String())
