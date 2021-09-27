@@ -10,6 +10,7 @@ import (
 	"github.com/Franlky01/bookingwebApp/internal/render"
 	"github.com/Franlky01/bookingwebApp/internal/repository"
 	"github.com/Franlky01/bookingwebApp/internal/repository/dbrepo"
+	"log"
 
 	"net/http"
 	"strconv"
@@ -437,4 +438,12 @@ func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 	m.App.Session.Put(r.Context(), "reservation", res)
 
 	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
+}
+
+func (m *Repository) ShowLogin(w http.ResponseWriter, r *http.Request) {
+	render.Template(w, r, "login.page.gohtml", &models.TemplateData{
+		Form: forms.New(nil)})
+}
+func (m Repository) PostShowLogin(w http.ResponseWriter, r *http.Request) {
+	log.Println("works")
 }
