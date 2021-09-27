@@ -1,6 +1,7 @@
 package dbrepo
 
 import (
+	"errors"
 	"github.com/Franlky01/bookingwebApp/internal/models"
 	"time"
 )
@@ -11,7 +12,10 @@ func (m *testDBRepo) AllUsers() bool {
 
 //InsertReservation insertes reservation into database
 func (m *testDBRepo) InsertReservation(res models.Reservation) (int, error) {
-
+	//if the room id is 2, then fail, other wise , pass
+	if res.RoomID == 2 {
+		return 0, errors.New("some error")
+	}
 	return 1, nil
 }
 
@@ -35,7 +39,13 @@ func (m *testDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]mode
 	return rooms, nil
 }
 
+// GetRoomByID gets a room by id
 func (m *testDBRepo) GetRoomByID(id int) (models.Room, error) {
+
 	var room models.Room
+	if id > 2 {
+		return room, errors.New("Some error")
+	}
+
 	return room, nil
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/Franlky01/bookingwebApp/internal/config"
 	"github.com/Franlky01/bookingwebApp/internal/driver"
 	"github.com/Franlky01/bookingwebApp/internal/forms"
@@ -131,6 +132,7 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//build  the reservation  Model up
 	reservation := models.Reservation{
 		FirstName: r.Form.Get("first_name"),
 		LastName:  r.Form.Get("last_name"),
@@ -141,13 +143,15 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		RoomID:    roomID,
 	}
 
+	// generate a form and  start testing
 	form := forms.New(r.PostForm)
 
+	// test all the fields from the user Form
 	form.Required("first_name", "last_name", "email")
-	form.MinLength("first_name", 3)
-	form.IsEmail("email")
+	form.MinLength("first_name", 3) // first name is atleast three character
+	form.IsEmail("email")           // make sure email is in form of email
 
-	if !form.Valid() {
+	if !form.Valid() { // if any field in form fails , return error and retain the Form also highlight  the error that they Have
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
 		http.Error(w, "my own error message", http.StatusSeeOther)
@@ -158,6 +162,7 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// if it gets passed that form input start,  then insert the details into the Database
 	newReservationID, err := m.DB.InsertReservation(reservation)
 	if err != nil {
 		m.App.Session.Put(r.Context(), "error", "can't insert reservation into database!")
@@ -178,7 +183,23 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		m.App.Session.Put(r.Context(), "error", "can't insert room restriction!")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
+
 	}
+
+	// send notifications - First to Guest
+	htmlMessage := fmt.Sprintf(`<strong>Reservation Confirmation</strong><br>
+
+Dear %s, <br>
+This is to confirm your reservation from %s to %s,`,
+		reservation.FirstName, reservation.StartDate.Format("2006-01.02"), reservation.EndDate.Format("2006-01-02"))
+
+	msg := models.MailData{
+		To:      reservation.Email,
+		From:    "me@here.com",
+		Subject: "Reservation Confirmation",
+		Content: htmlMessage,
+	}
+	m.App.MailChan <- msg // pass the Message for mail channel
 
 	m.App.Session.Put(r.Context(), "reservation", reservation)
 
@@ -203,6 +224,7 @@ func (m *Repository) Availability(w http.ResponseWriter, r *http.Request) {
 
 // PostAvailability renders the search availability page
 func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
+	// pass form populates the r.form for post request, it passes the raw request from the URl and Updates the Form
 	err := r.ParseForm()
 	if err != nil {
 		m.App.Session.Put(r.Context(), "error", "can't parse form!")
@@ -298,6 +320,7 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 			Message: "Error querying database",
 		}
 
+		// removed the error check, since we handle all aspect of the Json right here
 		out, _ := json.MarshalIndent(resp, "", "     ")
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(out)

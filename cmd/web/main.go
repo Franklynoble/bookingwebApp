@@ -31,6 +31,13 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.SQL.Close()
+	//defer close(app.MailChan)
+	//close the Mail channel..
+	defer close(app.MailChan)
+
+	//starting  mail listener
+	fmt.Println("start mail listening.... ")
+	listenForMail()
 
 	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
 
@@ -49,6 +56,15 @@ func run() (*driver.DB, error) {
 	gob.Register(models.User{})
 	gob.Register(models.Room{})
 	gob.Register(models.Restriction{})
+
+	//create channel from config files..
+
+	// this channel would listen for models.MailData
+	mailChan := make(chan models.MailData)
+
+	//populate app mailChan
+
+	app.MailChan = mailChan
 
 	// change this to true when in production
 	app.InProduction = false

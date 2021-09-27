@@ -11,4 +11,5 @@ require (
 	github.com/jackc/pgx/v4 v4.13.0
 	github.com/justinas/nosurf v1.1.1
 	github.com/tsawler/bookings v0.0.0-20210104180229-24e0fb459769
+	github.com/xhit/go-simple-mail/v2 v2.10.0 // indirect
 )
