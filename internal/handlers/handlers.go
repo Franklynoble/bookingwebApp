@@ -11,7 +11,6 @@ import (
 	"github.com/Franlky01/bookingwebApp/internal/repository"
 	"github.com/Franlky01/bookingwebApp/internal/repository/dbrepo"
 	"log"
-
 	"net/http"
 	"strconv"
 	"strings"
@@ -444,6 +443,57 @@ func (m *Repository) ShowLogin(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "login.page.gohtml", &models.TemplateData{
 		Form: forms.New(nil)})
 }
+
+// PostShowLogin handles logging in the user
 func (m Repository) PostShowLogin(w http.ResponseWriter, r *http.Request) {
-	log.Println("works")
+	//doing login and log out it is good practice to renew the code
+	_ = m.App.Session.RenewToken(r.Context())
+
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+	}
+	// using post form, you use this,
+	// get parameter from the form
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+	form := forms.New(r.PostForm)
+	//authenticating fields you use this fields
+	form.Required("email", "password")
+	form.IsEmail("email")
+
+	if !form.Valid() {
+		//TODO -take user back to page
+		render.Template(w, r, "login.page.gohtml", &models.TemplateData{
+			Form: form,
+		})
+		return
+	}
+	//now authenticate for  the user
+	id, _, err := m.DB.Authenticate(email, password)
+
+	if err != nil {
+		log.Println(err)
+
+		m.App.Session.Put(r.Context(), "error", "invalid login credentials")
+		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+		return
+	}
+	//if successfully loged in pu the session back
+	m.App.Session.Put(r.Context(), "user_id", id)
+	m.App.Session.Put(r.Context(), "flash", "Logged in successfully")
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+//  Logout logs a user out
+func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
+	//to logout, you must make sure the token is moved from the session, to do that you destroy the session,and renew it
+	_ = m.App.Session.Destroy(r.Context())
+	_ = m.App.Session.RenewToken(r.Context())
+
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}
+
+func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
+	render.Template(w, r, "admin-dashboard.page.gohtml", &models.TemplateData{})
 }
