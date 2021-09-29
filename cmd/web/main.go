@@ -25,6 +25,7 @@ var infoLog *log.Logger
 var errorLog *log.Logger
 
 // main is the main application function
+
 func main() {
 	db, err := run()
 	if err != nil {
