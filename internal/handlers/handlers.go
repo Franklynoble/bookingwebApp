@@ -6,6 +6,7 @@ import (
 	"github.com/Franlky01/bookingwebApp/internal/config"
 	"github.com/Franlky01/bookingwebApp/internal/driver"
 	"github.com/Franlky01/bookingwebApp/internal/forms"
+	"github.com/Franlky01/bookingwebApp/internal/helpers"
 	"github.com/Franlky01/bookingwebApp/internal/models"
 	"github.com/Franlky01/bookingwebApp/internal/render"
 	"github.com/Franlky01/bookingwebApp/internal/repository"
@@ -494,6 +495,78 @@ func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
+//AdminDashboard shows the admin dashboard
 func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "admin-dashboard.page.gohtml", &models.TemplateData{})
+}
+
+//AdminNewReservations shows  all new reservations in Admin Tool
+func (m *Repository) AdminNewReservations(w http.ResponseWriter, r *http.Request) {
+
+	reservations, err := m.DB.AllNewReservations()
+
+	if err != nil {
+		log.Println(err)
+	}
+	data := make(map[string]interface{})
+
+	data["reservations"] = reservations
+
+	render.Template(w, r, "admin-new-reservations.page.gohtml", &models.TemplateData{
+		Data: data,
+	})
+
+}
+func (m *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request) {
+
+	reservations, err := m.DB.AllReservations()
+
+	if err != nil {
+		log.Println(err)
+	}
+	data := make(map[string]interface{})
+
+	data["reservations"] = reservations
+
+	render.Template(w, r, "admin-all-reservations.page.gohtml", &models.TemplateData{
+		Data: data,
+	})
+}
+
+//AdminReservationsCalender displays the reservations Calender
+func (m *Repository) AdminReservationsCalender(w http.ResponseWriter, r *http.Request) {
+	render.Template(w, r, "admin-reservations-calender.page.gohtml", &models.TemplateData{})
+}
+
+//AdminShowReservations shows  all new reservations in Admin Tool
+func (m *Repository) AdminShowReservations(w http.ResponseWriter, r *http.Request) {
+	//get the URI variable at index position and  explode it i.e, select the vairaiable based on the index,
+	//index position count starts at 1
+	exploded := strings.Split(r.RequestURI, "/")
+	id, err := strconv.Atoi(exploded[4]) // get it at index position 4
+
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	src := exploded[3] // get element from URI at index position 3
+
+	stringMap := make(map[string]string)
+	stringMap["src"] = src
+
+	//get reservation from  the database
+	reservation, _ := m.DB.GetReservationByID(id) // if id not gotten, it would show  the  nil pointer address
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	data := make(map[string]interface{})
+	data["reservation"] = reservation // pass reservation id from db to the map
+
+	render.Template(w, r, "admin-reservations-show.page.gohtml", &models.TemplateData{
+		StringMap: stringMap,
+		Data:      data,
+		Form:      forms.New(nil),
+	})
 }

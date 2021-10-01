@@ -61,3 +61,26 @@ func (m *testDBRepo) Authenticate(email, testPassowrd string) (int, string, erro
 
 	return 1, "", nil
 }
+func (m *testDBRepo) AllReservations() ([]models.Reservation, error) {
+	var reservations []models.Reservation
+
+	return reservations, nil
+}
+
+//AllNewReservations returns a slice of all repository
+func (m *testDBRepo) AllNewReservations() ([]models.Reservation, error) {
+
+	var reservations []models.Reservation
+
+	return reservations, nil
+}
+
+//GetReservationByID resturns one reservation by ID
+func (m *testDBRepo) GetReservationByID(id int) (models.Reservation, error) {
+
+	//varaibale to be scanned to
+	var res models.Reservation
+
+	return res, nil
+
+}

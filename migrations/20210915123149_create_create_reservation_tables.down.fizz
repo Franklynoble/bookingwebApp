@@ -1,1 +1,1 @@
-sql("drop table reservations")
+sql("drop table reservation")
