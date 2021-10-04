@@ -3,14 +3,12 @@
 {{define "page-title"}}
    Show Reservations
 {{end}}
+
 {{define "content"}}
     {{$res := index .Data "reservation"}}
     {{$src := index .Data "src"}}
     <div class="col-md-12">
-     Show Reservations <br>  {{$res.FirstName}} {{$res.LastName}}
-
-
-        <p>
+           <p>
             <strong>Arrival: </strong> {{humanDate $res.StartDate}}<br>
             <strong>Departure: </strong> {{humanDate $res.EndDate}}<br>
             <strong>Room: </strong> {{$res.Room.RoomName}}
@@ -18,9 +16,6 @@
 
     <form action="/admin/reservations/{{$src}}/{{$res.ID}}" method="post" class="" novalidate>
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-        <input type="hidden" name="start_date" value="{{index .StringMap "start_date"}}">
-        <input type="hidden" name="end_date" value="{{index .StringMap "end_date"}}">
-        <input type="hidden" name="room_id" value="{{$res.RoomID}}">
 
         <div class="form-group mt-3">
             <label for="first_name">First Name:</label>
@@ -64,10 +59,9 @@
 
         <hr>
         <input type="submit" class="btn btn-primary" value="save">
-       <a href="/admin/reservations/{{$src}}" class="btn btn-warning">cancel</a>
+       <a href="/admin/reservations-new{{$src}}" class="btn btn-warning">cancel</a>
     </form>
 
-
-
+    </div>
 
 {{end}}

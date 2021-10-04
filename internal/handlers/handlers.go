@@ -570,3 +570,46 @@ func (m *Repository) AdminShowReservations(w http.ResponseWriter, r *http.Reques
 		Form:      forms.New(nil),
 	})
 }
+
+func (m *Repository) AdminPostReservation(w http.ResponseWriter, r *http.Request) {
+	// pass form populates the r.form for post request, it passes the raw request from the URl and Updates the Form
+	err := r.ParseForm()
+	if err != nil {
+		m.App.Session.Put(r.Context(), "error", "can't parse form!")
+		helpers.ServerError(w, err)
+		return
+	}
+
+	//get the URI variable at index position and  explode it i.e, select the vairaiable based on the index,
+	//index position count starts at 1
+	exploded := strings.Split(r.RequestURI, "/")
+	id, err := strconv.Atoi(exploded[4]) // get it at index position 4
+
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	src := exploded[3] // get element from URI at index position 3
+
+	stringMap := make(map[string]string)
+	stringMap["src"] = src
+	res, err := m.DB.GetReservationByID(id)
+
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	res.FirstName = r.Form.Get("first_name")
+	res.LastName = r.Form.Get("last_name")
+	res.Email = r.Form.Get("email")
+	res.Phone = r.Form.Get("phone")
+
+	err = m.DB.UpdatReservation(res)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	m.App.Session.Put(r.Context(), "flash", "changes saved")
+	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-new%s", src), http.StatusSeeOther)
+}
