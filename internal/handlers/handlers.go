@@ -11,6 +11,7 @@ import (
 	"github.com/Franlky01/bookingwebApp/internal/render"
 	"github.com/Franlky01/bookingwebApp/internal/repository"
 	"github.com/Franlky01/bookingwebApp/internal/repository/dbrepo"
+	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
 	"strconv"
@@ -579,7 +580,6 @@ func (m *Repository) AdminPostReservation(w http.ResponseWriter, r *http.Request
 		helpers.ServerError(w, err)
 		return
 	}
-
 	//get the URI variable at index position and  explode it i.e, select the vairaiable based on the index,
 	//index position count starts at 1
 	exploded := strings.Split(r.RequestURI, "/")
@@ -611,5 +611,29 @@ func (m *Repository) AdminPostReservation(w http.ResponseWriter, r *http.Request
 		return
 	}
 	m.App.Session.Put(r.Context(), "flash", "changes saved")
-	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-new%s", src), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-#{src}"), http.StatusSeeOther)
+}
+
+// AdminProcessReservation marks a reservation calendar
+func (m *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+	src := chi.URLParam(r, "src")
+
+	fmt.Println(id, src)
+	_ = m.DB.UpdateProcessedForReservation(id, 1)
+	m.App.Session.Put(r.Context(), "flash", "Reservation Marked as Processd")
+	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+
+}
+
+//AdminDeleteReservation deletes a Reservation
+func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+	src := chi.URLParam(r, "src")
+
+	fmt.Println(id, src)
+	_ = m.DB.DeleteReservation(id)
+	m.App.Session.Put(r.Context(), "flash", "Reservation deleted")
+	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+
 }

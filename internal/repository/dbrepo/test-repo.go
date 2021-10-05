@@ -95,3 +95,10 @@ func (m *testDBRepo) UpdateProcessedForReservation(id, processed int) error {
 	return nil
 
 }
+
+//DeleteReservation deletes reservation from the reservation Table
+func (m *testDBRepo) DeleteReservation(id int) error {
+
+	return nil
+
+}
