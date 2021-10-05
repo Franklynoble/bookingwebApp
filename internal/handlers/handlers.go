@@ -547,6 +547,12 @@ func (m *Repository) AdminReservationsCalender(w http.ResponseWriter, r *http.Re
 		now = time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
 
 	}
+	//dataMap for date textual format
+
+	data := make(map[string]interface{})
+
+	data["now"] = now
+
 	next := now.AddDate(0, 1, 0)
 	last := now.AddDate(0, -1, 0)
 	//two digits Month Format
@@ -564,12 +570,33 @@ func (m *Repository) AdminReservationsCalender(w http.ResponseWriter, r *http.Re
 	stringMap["last_month"] = lastMonth
 	stringMap["last_month_year"] = lastMonthYear
 
-	// format the date passed  ..
+	// format the date passed  ...
+
 	stringMap["this_month"] = now.Format("01")
 	stringMap["this_month_year"] = now.Format("2006")
 
+	// get the First and last days of the month
+
+	currenttYear, currentMonth, _ := now.Date()
+
+	currentLocation := now.Location()
+	firstOfMonth := time.Date(currenttYear, currentMonth, 1, 0, 0, 0, 0, currentLocation)
+	lastOfMonth := firstOfMonth.AddDate(0, 1, -1)
+
+	intMap := make(map[string]int)
+
+	intMap["days_in_month"] = lastOfMonth.Day()
+
+	rooms, err := m.DB.AllRooms()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	data["rooms"] = rooms
 	render.Template(w, r, "admin-reservations-calender.page.gohtml", &models.TemplateData{
 		StringMap: stringMap,
+		Data:      data,
+		IntMap:    intMap,
 	})
 }
 
@@ -669,5 +696,4 @@ func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Reque
 	_ = m.DB.DeleteReservation(id)
 	m.App.Session.Put(r.Context(), "flash", "Reservation deleted")
 	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
-
 }

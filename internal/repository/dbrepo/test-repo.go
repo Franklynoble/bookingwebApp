@@ -102,3 +102,8 @@ func (m *testDBRepo) DeleteReservation(id int) error {
 	return nil
 
 }
+func (m *testDBRepo) AllRooms() ([]models.Room, error) {
+	var rm []models.Room
+
+	return rm, nil
+}
