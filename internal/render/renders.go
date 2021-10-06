@@ -19,6 +19,11 @@ var functions = template.FuncMap{
 	"humanDate":  HumanDate,
 	"formatDate": formatDate,
 	"iterate":    Iterate,
+	"add":        Add,
+}
+
+func Add(a, b int) int {
+	return a + b
 }
 
 func formatDate(t time.Time, f string) string {
