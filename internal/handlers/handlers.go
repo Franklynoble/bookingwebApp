@@ -741,9 +741,10 @@ func (m *Repository) AdminPostReservationsCalender(w http.ResponseWriter, r *htt
 		helpers.ServerError(w, err)
 	}
 
-	year, _ := strconv.Atoi(r.Form.Get("y"))
-	month, _ := strconv.Atoi(r.Form.Get("m"))
+	//get date from the Url
+	//year, _ := strconv.Atoi(r.Form.Get("y"))
+	//month, _ := strconv.Atoi(r.Form.Get("m"))
 
 	m.App.Session.Put(r.Context(), "flash", "changes saved")
-	http.Redirect(w, r, fmt.Sprintf("admin/reservations-calender"))
+	//http.Redirect(w, r, fmt.Sprintf("admin/reservations-calender"))
 }
