@@ -741,10 +741,64 @@ func (m *Repository) AdminPostReservationsCalender(w http.ResponseWriter, r *htt
 		helpers.ServerError(w, err)
 	}
 
-	//get date from the Url
-	//year, _ := strconv.Atoi(r.Form.Get("y"))
-	//month, _ := strconv.Atoi(r.Form.Get("m"))
+	//get date from the URL
+	year, _ := strconv.Atoi(r.Form.Get("y"))
+	month, _ := strconv.Atoi(r.Form.Get("m"))
 
+	//process blocks
+
+	rooms, err := m.DB.AllRooms()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+
+	for _, x := range rooms {
+		//			get the block map from the session, Loop through entire map, if we have an entry in the map
+		//	that does not exist in our posted, and if the restriction id > 0, then it is a block we need to
+		//remove
+
+		// get the session context
+		// cast the block_map into map,strint int
+		curMap := m.App.Session.Get(r.Context(), fmt.Sprintf("block_map_%d", x.ID)).(map[string]int)
+		for name, value := range curMap {
+			// ok , will be false if the value is not in the map
+			if val, ok := curMap[name]; ok {
+				// only pay attention to value > 0, and that are not in the form post
+				// the rest are just placeholders for days without block
+				if val > 0 {
+					if !form.Has(fmt.Sprintf("remove_block_%d_%s", x.ID, name)) {
+						// delete the restriction by id
+						//	log.Println("would delete block", value)
+						err := m.DB.DeleteBlockByID(value)
+						if err != nil {
+							log.Println(err)
+						}
+					}
+				}
+			}
+		}
+	}
+	// now handle new blocks
+	for name, _ := range r.PostForm {
+		if strings.HasPrefix(name, "add_block") {
+			exploded := strings.Split(name, "_") // splits back  a sclice of string
+			roomID, _ := strconv.Atoi(exploded[2])
+
+			//insert  a new Block
+			//	log.Println("Would insert a block id ", roomID , "for date",exploded[3])
+			t, _ := time.Parse("2006-01-2", exploded[3])
+			err := m.DB.InsertBlockForRoom(roomID, t)
+			if err != nil {
+				log.Println(err)
+			}
+
+		}
+
+		//log.Println("form has Name:",name)
+	}
 	m.App.Session.Put(r.Context(), "flash", "changes saved")
-	//http.Redirect(w, r, fmt.Sprintf("admin/reservations-calender"))
+	http.Redirect(w, r, fmt.Sprintf("admin/reservations-calender?y=%d&m=%d", year, month), http.StatusSeeOther)
 }

@@ -48,8 +48,19 @@ func (f *Form) MinLength(field string, length int) bool {
 }
 
 //Has checks if form field is post and not empty
-func (f *Form) Has(field string, r *http.Request) bool {
-	x := r.Form.Get(field)
+func (f *Form) Has(field string) bool {
+	x := f.Get(field)
+	if x == "" {
+		f.Errors.Add(field, "this field can not be blank")
+		return false
+	}
+	return true
+}
+
+//Has checks if form field is post and not empty
+func (f *Form) Has2(field string, s string) bool {
+	var b http.Request
+	x := b.Form.Get(s)
 	if x == "" {
 		f.Errors.Add(field, "this field can not be blank")
 		return false

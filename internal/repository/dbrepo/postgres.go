@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/Franlky01/bookingwebApp/internal/models"
 	"golang.org/x/crypto/bcrypt"
+	"log"
 	"time"
 )
 
@@ -498,5 +499,43 @@ from room_restriction where $1< end_date and $2 >= start_date
 		return nil, err
 	}
 	return restrictions, nil
+
+}
+
+//  InsertBlockForRoom inserts a room restriction
+func (m *postgresDBRepo) InsertBlockForRoom(id int, startDate time.Time) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `insert into room_restriction(start_date, end_date, room_id, restriction_id, created_at, updated_at)
+      values($1,$2,$3,$4,$5,$6)
+`
+	_, err := m.DB.ExecContext(ctx, query, startDate, startDate.AddDate(0, 0, 1), id, 2, time.Now(), time.Now())
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+
+}
+
+//  DeleteBlockByID deletes a room restriction
+func (m *postgresDBRepo) DeleteBlockByID(id int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `delete from room_restriction where id = $1`
+
+	//	`insert into room_restriction(start_date, end_date, room_id, restriction_id, created_at, updated_at)
+	//values($1,$2,$3,$4,$5,$6)
+
+	_, err := m.DB.ExecContext(ctx, query, id)
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
 
 }
