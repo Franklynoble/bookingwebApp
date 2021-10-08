@@ -538,7 +538,7 @@ func (m *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request
 }
 
 //AdminReservationsCalender displays the reservations Calender
-func (m *Repository) AdminReservationsCalender(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Request) {
 	//assume that there is  no month specified
 
 	now := time.Now()
@@ -630,7 +630,7 @@ func (m *Repository) AdminReservationsCalender(w http.ResponseWriter, r *http.Re
 		m.App.Session.Put(r.Context(), fmt.Sprintf("block_map_%d", x.ID), blockMap)
 	}
 
-	render.Template(w, r, "admin-reservations-calender.page.gohtml", &models.TemplateData{
+	render.Template(w, r, "admin-reservations-calendar.page.gohtml", &models.TemplateData{
 		StringMap: stringMap,
 		Data:      data,
 		IntMap:    intMap,
@@ -734,7 +734,7 @@ func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Reque
 	m.App.Session.Put(r.Context(), "flash", "Reservation deleted")
 	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
 }
-func (m *Repository) AdminPostReservationsCalender(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) AdminPostReservationsCalendar(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 
 	if err != nil {
@@ -800,5 +800,6 @@ func (m *Repository) AdminPostReservationsCalender(w http.ResponseWriter, r *htt
 		//log.Println("form has Name:",name)
 	}
 	m.App.Session.Put(r.Context(), "flash", "changes saved")
-	http.Redirect(w, r, fmt.Sprintf("admin/reservations-calender?y=%d&m=%d", year, month), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%d&m=%d", year, month), http.StatusSeeOther)
+
 }
