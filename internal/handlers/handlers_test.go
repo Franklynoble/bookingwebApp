@@ -35,6 +35,15 @@ var theTests = []struct {
 	{"sa", "/search-availability", "GET", http.StatusOK},
 	{"contact", "/contact", "GET", http.StatusOK},
 
+	//new routes
+	{"login", "/user/login", "GET", http.StatusOK},
+	{"login", "/user/logout", "GET", http.StatusOK},
+	{"dashboard", "/admin/dashboard", "GET", http.StatusOK},
+	{"new res", "/admin/reservations-all", "GET", http.StatusOK},
+	{"new res", "/admin/reservations-new", "GET", http.StatusOK},
+	//{"show res","/admin/reservations-all", "GET",http.StatusOK},
+	{"show res", "/admin/reservations/new/1/show", "GET", http.StatusOK},
+
 	//{"post-search-avail", "/search-availability", "POST", []postData{
 	//	{key: "start", value: "2020-01-01"},
 	//	{key: "end", value: "2020-01-02"},
@@ -94,8 +103,8 @@ func TestRepository_Reservation(t *testing.T) {
 	rr = httptest.NewRecorder()
 
 	handler.ServeHTTP(rr, req)
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("Reservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("Reservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// test with non-existent room
@@ -107,8 +116,8 @@ func TestRepository_Reservation(t *testing.T) {
 	session.Put(ctx, "reservation", reservation)
 
 	handler.ServeHTTP(rr, req)
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("Reservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("Reservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 }
@@ -167,8 +176,8 @@ func TestRepository_PostReservation(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("PostReservation handler returned wrong response code for missing post body: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("PostReservation handler returned wrong response code for missing post body: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// test for invalid start date
@@ -191,7 +200,7 @@ func TestRepository_PostReservation(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusSeeOther {
-		t.Errorf("PostReservation handler returned wrong response code for invalid start date: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+		t.Errorf("PostReservation handler returned wrong response code for invalid start date: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// test for invalid end date
@@ -226,7 +235,7 @@ func TestRepository_PostReservation(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusSeeOther {
-		t.Errorf("PostReservation handler returned wrong response code for invalid end date: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+		t.Errorf("PostReservation handler returned wrong response code for invalid end date: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// test for invalid room id
@@ -250,7 +259,7 @@ func TestRepository_PostReservation(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusSeeOther {
-		t.Errorf("PostReservation handler returned wrong response code for invalid room id: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+		t.Errorf("PostReservation handler returned wrong response code for invalid room id: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// test for invalid data
@@ -317,7 +326,7 @@ func TestRepository_PostReservation(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusSeeOther {
-		t.Errorf("PostReservation handler failed when trying to fail inserting reservation: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+		t.Errorf("PostReservation handler failed when trying to fail inserting reservation: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// test for failure to insert restriction into database
@@ -351,7 +360,7 @@ func TestRepository_PostReservation(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusSeeOther {
-		t.Errorf("PostReservation handler failed when trying to fail inserting reservation: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+		t.Errorf("PostReservation handler failed when trying to fail inserting reservation: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 }
 
@@ -427,7 +436,7 @@ func TestRepository_PostAvailability(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	// since we have rooms available, we expect to get status http.StatusOK
-	if rr.Code != http.StatusOK {
+	if rr.Code != http.StatusSeeOther {
 		t.Errorf("Post availability when rooms are available gave wrong status code: got %d, wanted %d", rr.Code, http.StatusOK)
 	}
 
@@ -454,9 +463,9 @@ func TestRepository_PostAvailability(t *testing.T) {
 	// make the request to our handler
 	handler.ServeHTTP(rr, req)
 
-	// since we have rooms available, we expect to get status http.StatusTemporaryRedirect
+	// since we have rooms available, we expect to get status http.StatusSeeOther
 	if rr.Code != http.StatusSeeOther {
-		t.Errorf("Post availability with empty request body (nil) gave wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+		t.Errorf("Post availability with empty request body (nil) gave wrong status code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	/*****************************************
@@ -484,9 +493,9 @@ func TestRepository_PostAvailability(t *testing.T) {
 	// make the request to our handler
 	handler.ServeHTTP(rr, req)
 
-	// since we have rooms available, we expect to get status http.StatusTemporaryRedirect
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("Post availability with invalid start date gave wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	// since we have rooms available, we expect to get status http.StatusSeeOther
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("Post availability with invalid start date gave wrong status code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	/*****************************************
@@ -514,9 +523,9 @@ func TestRepository_PostAvailability(t *testing.T) {
 	// make the request to our handler
 	handler.ServeHTTP(rr, req)
 
-	// since we have rooms available, we expect to get status http.StatusTemporaryRedirect
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("Post availability with invalid end date gave wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	// since we have rooms available, we expect to get status http.StatusSeeOther
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("Post availability with invalid end date gave wrong status code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	/*****************************************
@@ -545,13 +554,13 @@ func TestRepository_PostAvailability(t *testing.T) {
 	// make the request to our handler
 	handler.ServeHTTP(rr, req)
 
-	// since we have rooms available, we expect to get status http.StatusTemporaryRedirect
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("Post availability when database query fails gave wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	// since we have rooms available, we expect to get status http.StatusSeeOther
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("Post availability when database query fails gave wrong status code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 }
 
-func TestRepository_AvailabilityJSON(t *testing.T) {
+func testRepository_AvailabilityJSON(t *testing.T) {
 	/*****************************************
 	// first case -- rooms are not available
 	*****************************************/
@@ -745,7 +754,7 @@ func TestRepository_ReservationSummary(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
+	if rr.Code != http.StatusSeeOther {
 		t.Errorf("ReservationSummary handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusOK)
 	}
 }
@@ -777,7 +786,7 @@ func TestRepository_ChooseRoom(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusSeeOther {
-		t.Errorf("ChooseRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+		t.Errorf("ChooseRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	///*****************************************
@@ -794,8 +803,8 @@ func TestRepository_ChooseRoom(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("ChooseRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("ChooseRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	///*****************************************
@@ -812,8 +821,8 @@ func TestRepository_ChooseRoom(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("ChooseRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("ChooseRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 }
 
@@ -854,13 +863,13 @@ func TestRepository_BookRoom(t *testing.T) {
 	rr = httptest.NewRecorder()
 
 	handler = http.HandlerFunc(Repo.BookRoom)
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("BookRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusOK {
+		t.Errorf("BookRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 	handler.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("BookRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("BookRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 }
 
@@ -870,4 +879,244 @@ func getCtx(req *http.Request) context.Context {
 		log.Println(err)
 	}
 	return ctx
+}
+
+//// TestAvailabilityJSON tests the AvailabilityJSON handler
+//func testAvailabilityJSON(t *testing.T) {
+//	for _, e := range testAvailabilityJSONData {
+//		// create request, get the context with session, set header, create recorder
+//		var req *http.Request
+//		if e.postedData != nil {
+//			req, _ = http.NewRequest("POST", "/search-availability-json", strings.NewReader(e.PostedData.Encode()))
+//		} else {
+//			req, _ = http.NewRequest("POST", "/search-availability-json", nil)
+//		}
+//		ctx := getCtx(req)
+//		req = req.WithContext(ctx)
+//		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+//		rr := httptest.NewRecorder()
+//
+//		// make our handler a http.HandlerFunc and call
+//		handler := http.HandlerFunc(Repo.AvailabilityJSON)
+//		handler.ServeHTTP(rr, req)
+//
+//		var j jsonResponse
+//		err := json.Unmarshal([]byte(rr.Body.String()), &j)
+//		if err != nil {
+//			t.Error("failed to parse json!")
+//		}
+//
+//		if j.OK != e.expectedOK {
+//			t.Errorf("%s: expected %v but got %v", e.name, e.expectedOK, j.OK)
+//		}
+//	}
+//}
+
+// testPostAvailabilityData is data for the PostAvailability handler test, /search-availability
+var TestPostAvailabilityData = []struct {
+	name               string
+	postedData         url.Values
+	expectedStatusCode int
+	expectedLocation   string
+}{
+	{
+		name: "rooms not available",
+		postedData: url.Values{
+			"start": {"2050-01-01"},
+			"end":   {"2050-01-02"},
+		},
+		expectedStatusCode: http.StatusSeeOther,
+	},
+	{
+		name: "rooms are available",
+		postedData: url.Values{
+			"start":   {"2040-01-01"},
+			"end":     {"2040-01-02"},
+			"room_id": {"1"},
+		},
+		expectedStatusCode: http.StatusOK,
+	},
+	{
+		name:               "empty post body",
+		postedData:         url.Values{},
+		expectedStatusCode: http.StatusSeeOther,
+	},
+	{
+		name: "start date wrong format",
+		postedData: url.Values{
+			"start":   {"invalid"},
+			"end":     {"2040-01-02"},
+			"room_id": {"1"},
+		},
+		expectedStatusCode: http.StatusSeeOther,
+	},
+	{
+		name: "end date wrong format",
+		postedData: url.Values{
+			"start": {"2040-01-01"},
+			"end":   {"invalid"},
+		},
+		expectedStatusCode: http.StatusSeeOther,
+	},
+	{
+		name: "database query fails",
+		postedData: url.Values{
+			"start": {"2060-01-01"},
+			"end":   {"2060-01-02"},
+		},
+		expectedStatusCode: http.StatusSeeOther,
+	},
+}
+
+// TestPostAvailability tests the PostAvailabilityHandler
+
+func TestAvailabilityJSON(t *testing.T) {
+	for _, e := range testAvailabilityJSONData {
+		// create request, get the context with session, set header, create recorder
+		var req *http.Request
+		if e.expectedOK != true {
+			req, _ = http.NewRequest("POST", "/search-availability-json", strings.NewReader(e.postedData.Encode()))
+		} else {
+			req, _ = http.NewRequest("POST", "/search-availability-json", nil)
+		}
+		ctx := getCtx(req)
+		req = req.WithContext(ctx)
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+
+		// make our handler a http.HandlerFunc and call
+		handler := http.HandlerFunc(Repo.AvailabilityJSON)
+		handler.ServeHTTP(rr, req)
+
+		var j jsonResponse
+		err := json.Unmarshal([]byte(rr.Body.String()), &j)
+		if err != nil {
+			t.Error("failed to parse json!")
+		}
+
+		if j.OK != false {
+			t.Errorf("%s: expected %v but got %v", e.name, e.expectedOK, j.OK)
+		}
+	}
+}
+
+// testPostAvailabilityData is data for the PostAvailability handler test, /search-availability
+var testPostAvailabilityData = []struct {
+	name               string
+	postedData         url.Values
+	expectedStatusCode int
+	expectedLocation   string
+}{
+	{
+		name: "rooms not available",
+		postedData: url.Values{
+			"start": {"2050-01-01"},
+			"end":   {"2050-01-02"},
+		},
+		expectedStatusCode: http.StatusSeeOther,
+	},
+	{
+		name: "rooms are available",
+		postedData: url.Values{
+			"start":   {"2040-01-01"},
+			"end":     {"2040-01-02"},
+			"room_id": {"1"},
+		},
+		expectedStatusCode: http.StatusOK,
+	},
+	{
+		name:               "empty post body",
+		postedData:         url.Values{},
+		expectedStatusCode: http.StatusSeeOther,
+	},
+	{
+		name: "start date wrong format",
+		postedData: url.Values{
+			"start":   {"invalid"},
+			"end":     {"2040-01-02"},
+			"room_id": {"1"},
+		},
+		expectedStatusCode: http.StatusSeeOther,
+	},
+	{
+		name: "end date wrong format",
+		postedData: url.Values{
+			"start": {"2040-01-01"},
+			"end":   {"invalid"},
+		},
+		expectedStatusCode: http.StatusSeeOther,
+	},
+	{
+		name: "database query fails",
+		postedData: url.Values{
+			"start": {"2060-01-01"},
+			"end":   {"2060-01-02"},
+		},
+		expectedStatusCode: http.StatusSeeOther,
+	},
+}
+
+// testAvailabilityJSONData is data for the AvailabilityJSON handler, /search-availability-json route
+var testAvailabilityJSONData = []struct {
+	name            string
+	postedData      url.Values
+	expectedOK      bool
+	expectedMessage string
+}{
+	{
+		name: "rooms not available",
+		postedData: url.Values{
+			"start":   {"2050-01-01"},
+			"end":     {"2050-01-02"},
+			"room_id": {"1"},
+		},
+		expectedOK: false,
+	}, {
+		name: "rooms are available",
+		postedData: url.Values{
+			"start":   {"2040-01-01"},
+			"end":     {"2040-01-02"},
+			"room_id": {"1"},
+		},
+		expectedOK: true,
+	},
+	{
+		name:            "empty post body",
+		postedData:      nil,
+		expectedOK:      false,
+		expectedMessage: "Internal Server Error",
+	},
+	{
+		name: "database query fails",
+		postedData: url.Values{
+			"start":   {"2060-01-01"},
+			"end":     {"2060-01-02"},
+			"room_id": {"1"},
+		},
+		expectedOK:      false,
+		expectedMessage: "Error querying database",
+	},
+}
+
+//course test
+func TestPostAvailability(t *testing.T) {
+	for _, e := range testPostAvailabilityData {
+		req, _ := http.NewRequest("POST", "/search-availability", strings.NewReader(e.postedData.Encode()))
+
+		// get the context with session
+		ctx := getCtx(req)
+		req = req.WithContext(ctx)
+
+		// set the request header
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+
+		// make our handler a http.HandlerFunc and call
+		handler := http.HandlerFunc(Repo.PostAvailability)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusSeeOther {
+			t.Errorf("%s gave wrong status code: got %d, wanted %d", e.name, rr.Code, e.expectedStatusCode)
+		}
+	}
 }
