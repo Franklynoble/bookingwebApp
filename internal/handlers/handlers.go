@@ -654,6 +654,13 @@ func (m *Repository) AdminShowReservations(w http.ResponseWriter, r *http.Reques
 	stringMap := make(map[string]string)
 	stringMap["src"] = src
 
+	//get query parameters from the usrl
+	year := r.URL.Query().Get("y")
+	month := r.URL.Query().Get("m")
+
+	stringMap["month"] = month
+	stringMap["year"] = year
+
 	//get reservation from  the database
 	reservation, _ := m.DB.GetReservationByID(id) // if id not gotten, it would show  the  nil pointer address
 	if err != nil {
@@ -708,8 +715,19 @@ func (m *Repository) AdminPostReservation(w http.ResponseWriter, r *http.Request
 		helpers.ServerError(w, err)
 		return
 	}
+	month := r.Form.Get("month")
+	year := r.Form.Get("year")
+
 	m.App.Session.Put(r.Context(), "flash", "changes saved")
-	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-#{src}"), http.StatusSeeOther)
+
+	if year == "" {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%s&m=%s", year, month), http.StatusSeeOther)
+
+	}
+
+	//http.Redirect(w, r, fmt.Sprintf("/admin/reservations-#{src}"), http.StatusSeeOther)
 }
 
 // AdminProcessReservation marks a reservation calendar
@@ -718,9 +736,21 @@ func (m *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Requ
 	src := chi.URLParam(r, "src")
 
 	fmt.Println(id, src)
-	_ = m.DB.UpdateProcessedForReservation(id, 1)
+	err := m.DB.UpdateProcessedForReservation(id, 1)
+
+	if err != nil {
+		log.Println(err)
+	}
+	year := r.URL.Query().Get("y")
+	month := r.URL.Query().Get("m")
+
 	m.App.Session.Put(r.Context(), "flash", "Reservation Marked as Processd")
-	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+	if year == "" {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%s&m=%s", year, month), http.StatusSeeOther)
+
+	}
 
 }
 
@@ -730,10 +760,24 @@ func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Reque
 	src := chi.URLParam(r, "src")
 
 	fmt.Println(id, src)
-	_ = m.DB.DeleteReservation(id)
+	err := m.DB.DeleteReservation(id)
+	if err != nil {
+		log.Println(err)
+	}
+	year := r.URL.Query().Get("y")
+	month := r.URL.Query().Get("m")
+
 	m.App.Session.Put(r.Context(), "flash", "Reservation deleted")
-	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+
+	if year == "" {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%s&m=%s", year, month), http.StatusSeeOther)
+
+	}
+
 }
+
 func (m *Repository) AdminPostReservationsCalendar(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 
