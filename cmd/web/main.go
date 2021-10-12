@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/gob"
+	"flag"
 	"fmt"
 	"github.com/Franlky01/bookingwebApp/internal/config"
 	"github.com/Franlky01/bookingwebApp/internal/driver"
@@ -59,6 +60,26 @@ func run() (*driver.DB, error) {
 	gob.Register(models.Restriction{})
 	gob.Register(map[string]int{})
 
+	//read flags
+	//these are all pointers, to call these, you must use pointer
+	inProdution := flag.Bool("production", true, "Application is in production")
+	useCache := flag.Bool("cache", true, "Use template cache")
+	dbHost := flag.String("dbhost", "localhost", "Database host")
+	dbName := flag.String("dbname", "postgres", "Database name")
+	dbUser := flag.String("dbuser", "postgres", "Database user")
+	dbPass := flag.String("dbpass", "frank", "Database password")
+	dbPort := flag.String("dbport", "5432", "Database port")
+	dbSSl := flag.String("dbssl", "disable", "Database ssl settings (disable, prefer,require) ")
+
+	//call the flags
+	flag.Parse()
+
+	if *dbName == "" || *dbUser == "" {
+		fmt.Println("Missing required flags")
+		os.Exit(1)
+
+	}
+
 	//create channel from config files..
 
 	// this channel would listen for models.MailData
@@ -69,7 +90,8 @@ func run() (*driver.DB, error) {
 	app.MailChan = mailChan
 
 	// change this to true when in production
-	app.InProduction = false
+	app.InProduction = *inProdution
+	app.UseCache = *useCache
 
 	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.InfoLog = infoLog
@@ -87,7 +109,10 @@ func run() (*driver.DB, error) {
 
 	// connect to database
 	log.Println("Connecting to database...")
-	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=postgres user=postgres password=frank")
+	connectionString := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s", *dbHost, *dbPort, *dbName, *dbUser, *dbPass, *dbSSl)
+	db, err := driver.ConnectSQL(connectionString)
+	//	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=postgres user=postgres password=frank")
+
 	if err != nil {
 		log.Fatal("Cannot connect to database! Dying...")
 	}
@@ -100,7 +125,7 @@ func run() (*driver.DB, error) {
 	}
 
 	app.TemplateCache = tc
-	app.UseCache = false
+	//app.UseCache = false
 
 	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)

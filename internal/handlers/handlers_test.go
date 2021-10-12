@@ -873,6 +873,74 @@ func TestRepository_BookRoom(t *testing.T) {
 	}
 }
 
+var loginTests = []struct {
+	name               string
+	email              string
+	expectedStatusCode int
+	expectedHTML       string
+	expectedLocation   string
+}{
+	{"valid-credentials",
+		"me@here.ca",
+		http.StatusSeeOther,
+		"",
+		"/"}, // redirect to the homePage with this URL
+	{
+		"invlaid-credentials",
+		"jack@nimble.com",
+		http.StatusSeeOther,
+		"",
+		"/user/login",
+	},
+	{"invalid-date",
+		"j",
+		http.StatusOK,
+		`action="/userr/login"`,
+		"",
+	},
+}
+
+func TestLogin(t *testing.T) {
+	//range through all tests
+	for _, e := range loginTests {
+		postedData := url.Values{}
+		postedData.Add("email", e.email)
+		postedData.Add("password", "password")
+
+		//create request
+		req, _ := http.NewRequest("POST", "/user/login", strings.NewReader(postedData.Encode()))
+		ctx := getCtx(req)
+		req = req.WithContext(ctx)
+
+		// set the header
+		req.Header.Set("content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+
+		// call the handler
+		handler := http.HandlerFunc(Repo.PostShowLogin)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != e.expectedStatusCode {
+			t.Errorf("failed %s: expected code %d, but got %d", e.name, e.expectedStatusCode, rr.Code)
+
+		}
+		if e.expectedLocation != "" {
+			// get the URL from test
+			actualLoc, _ := rr.Result().Location()
+			if actualLoc.String() != e.expectedLocation {
+				t.Errorf("failed %s: expected location %s, but got location %s", e.name, e.expectedLocation, actualLoc.String())
+			}
+			if e.expectedHTML != "" {
+				//read the response body into a string
+				html := rr.Body.String()
+				if !strings.Contains(html, e.expectedHTML) {
+					t.Errorf("failed %s: expected to find %s", e.name, e.expectedHTML)
+				}
+			}
+		}
+	}
+}
+
 func getCtx(req *http.Request) context.Context {
 	ctx, err := session.Load(req.Context(), req.Header.Get("X-Session"))
 	if err != nil {
